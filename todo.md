@@ -13,3 +13,12 @@
   * [x] Creating a character should only ask for a name, the only static field in a character, and which ruleset to use for the character.
   * [x] When the character is created it is added to the roster (The main screen), it can be opened to be viewed and edited (this is the same thing)
   * [x] "Fields" are presented better, with categories to group them
+
+* [ ] Finalize session implementation
+  * [ ] Add character storage to session (save/load)
+  * [ ] Implement character ownership
+    * [ ] Display owner on character card
+  * [ ] Implement popout for text inputs
+    * [ ] Store history in localStorage
+    * [ ] Popout should allow deleting entries from history
+    * [ ] Remember past session IDs and show in popout on ID inputs

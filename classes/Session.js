@@ -2,10 +2,15 @@
  * @property {{ name:string, characters:Character[], active:boolean }[]} Players
  */
 class Session {
+	/** @var {string} */
 	ID
+	/** @var {string} */
 	Name
+	/** @var {Ruleset} */
 	Ruleset
+	/** @var {int} */
 	EncumbranceOption
+	/** @var {string[]} */
 	Players
 
 	CurrentUsername = null;
@@ -28,7 +33,7 @@ class Session {
 	constructor(id, options = {}) {
 		this.ID = id;
 		this.Name = options.name || null;
-		this.Ruleset = options.ruleset || null;
+		this.Ruleset = Ruleset[options.ruleset] || null;
 		this.EncumbranceOption = options.encumbrance_option || 0;
 
 		this.Players = [];
@@ -45,7 +50,6 @@ class Session {
 
 	/**
 	 * @param {{ session_pwd:string, gm_pwd:string, success_callback:function, fail_callback:function }} options Fail callback receives an error message as the first parameter.
-	 * @constructor
 	 */
 	CreateSession(options) {
 		if (typeof options.success_callback !== "function")
@@ -78,7 +82,6 @@ class Session {
 
 	/**
 	 * @param {{ pwd:string, gm_pwd:string, success_callback:function, fail_callback:function }} options
-	 * @constructor
 	 */
 	LoadSession(options) {
 		if (typeof options.success_callback !== "function")
@@ -103,7 +106,6 @@ class Session {
 	/**
 	 *
 	 * @param {{ pwd:string, gm_pwd:string, success_callback:function, fail_callback:function }} options
-	 * @constructor
 	 */
 	JoinSession(options) {
 		if (typeof options.success_callback !== "function")
@@ -130,11 +132,7 @@ class Session {
 
 	}
 
-	/**
-	 * @returns Ruleset
-	 * @constructor
-	 */
 	GetRuleset() {
-		return Ruleset[this.Ruleset];
+		return this.Ruleset;
 	}
 }
