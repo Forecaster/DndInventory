@@ -1,0 +1,3 @@
+class DialogSessionJoin extends Dialog {
+	
+}

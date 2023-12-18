@@ -1,0 +1,98 @@
+
+.inventory_tile_row {
+	margin-bottom: -5px;
+}
+
+.inventory_tile {
+	position: relative;
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+	background-color: #3f3f3f;
+	border: 1px solid black;
+	box-sizing: border-box;
+	margin-top: 1px;
+}
+
+.inventory_tile.level1 {
+	background-color: green;
+}
+
+.inventory_tile.level2 {
+	background-color: darkorange;
+}
+
+.inventory_tile.level3 {
+	background-color: darkred;
+}
+
+.inventory_tile.blocked {
+	background-color: red;
+}
+
+.item {
+	position: relative;
+	z-index: 1000;
+	transform-origin: top left;
+	pointer-events: none;
+}
+
+.item_title {
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	z-index: 2000;
+	font-weight: bold;
+}
+
+.item_icon {
+	position: absolute;
+	background-size: cover;
+}
+
+.item.dragging > .item_tile, .item.dragging > .item_tile_blank {
+	pointer-events: none;
+}
+
+.item.rotate90 {
+	transform: translate(0, 30px) rotate(-90deg);
+}
+
+.item.rotate180 {
+	transform: translate(30px, 30px) rotate(-180deg);
+}
+
+.item.rotate270 {
+	transform: translate(30px, 0) rotate(-270deg);
+}
+
+.item_tile, .item_tile_blank {
+	position: absolute;
+	width: 30px;
+	height: 30px;
+	background-color: transparent;
+	border: 2px solid transparent;
+}
+
+.item_tile_blank {
+	pointer-events: none;
+}
+
+.item_tile {
+	pointer-events: all;
+	background-color: rgba(255, 0, 0);
+	border: 2px dashed orange;
+	box-sizing: border-box;
+}
+
+.equipment_slot {
+	position: absolute;
+	background-color: rgba(255, 255, 255, .5);
+	border: 1px dotted black;
+	width: 40px;
+	height: 40px;
+}
+
+.equipment_slot.blocked {
+	background-color: red;
+}

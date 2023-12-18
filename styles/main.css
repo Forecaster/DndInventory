@@ -1,0 +1,160 @@
+body {
+	--bs-body-bg: #141414;
+	--bs-body-color: white;
+
+	position: absolute;
+	background-color: #0a0a0a;
+	color: white;
+	width: 99%;
+	height: 99%;
+	font-family: system-ui;
+}
+
+input::placeholder {
+	color: #646464 !important;
+}
+
+input.failed {
+	border-color: red;
+}
+
+.tooltip {
+	z-index: 10000;
+	background-color: rgba(0, 0, 0, .85);
+	border-radius: 10px;
+	position: fixed;
+	padding: 10px;
+}
+
+.tooltip > title {
+	display: block;
+	font-size: 16pt;
+	font-weight: bold;
+	margin-bottom: 4px;
+}
+
+.tooltip > tt_body {
+	color: #afafaf;
+}
+
+.sm-text {
+	font-size: 10pt;
+	color: gray;
+}
+
+.error_output, .success_output {
+	font-weight: bold;
+	font-size: 14pt;
+	padding: 5px;
+	padding-left: 10px;
+	margin-top: 12px;
+	border-radius: 15px;
+}
+
+.error_output {
+	background-color: #ff5454;
+	color: white;
+}
+
+.success_output {
+	background-color: #29ff29;
+	color: white;
+}
+
+.controls {
+	margin-bottom: 20px;
+}
+
+.menu_top {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	text-align: center;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	background-color: #360a0a;
+}
+
+.menu_side {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 160px;
+	height: 100%;
+	background-color: #360a0a;
+}
+
+.menu_button {
+	width: 150px;
+	background-color: rgba(0,0,0,.5);
+	text-align: center;
+	vertical-align: middle;
+	word-break: break-all;
+	font-size: 14pt;
+	font-weight: bold;
+	cursor: pointer;
+	border-radius: 3px;
+	margin: 5px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.menu_button:active {
+	background-color: white;
+	color: black;
+}
+
+.clock_real, .clock_game {
+	display: inline-block;
+}
+
+.divider {
+	display: inline-block;
+}
+
+.dialog {
+	border-radius: 15px;
+	background-color: rgb(66, 66, 66);
+	color: white;
+}
+
+.dialog::backdrop {
+	background-color: rgba(0, 0, 0, 0.8);
+}
+
+.close_button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 5px;
+	background-color: red;
+	color: white;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.close_button::after {
+	content: "X";
+}
+
+.b {
+	font-weight: bold;
+}
+
+.center {
+	text-align: center;
+}
+
+#character_container {
+	padding: 20px;
+}
+
+.stripes .row:nth-child(2n+1) {
+	background-color: rgba(0,0,0,.1);
+}
+
+.main_container {
+	margin-left: 160px;
+	margin-top: 20px;
+}

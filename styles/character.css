@@ -1,0 +1,129 @@
+
+.dice_button {
+	cursor: pointer;
+}
+
+.dice_button:after {
+	content: '⚅';
+}
+
+.character_compact {
+	position: relative;
+	width: 500px;
+	border-radius: 20px;
+	background-color: rgba(255,255,255,0.2);
+	padding: 10px;
+	margin: 5px;
+
+	.control_container {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+	}
+
+	.open_sheet, .delete_character {
+		display: inline-block;
+		cursor: pointer;
+		width: 25px;
+		height: 25px;
+		text-align: center;
+	}
+
+	.open_sheet:hover {
+		background-color: color-mix(in srgb, white 20%, transparent);
+	}
+
+	.open_sheet:after {
+		content: '🗖';
+	}
+
+	.delete_character:after {
+		content: '💀';
+	}
+
+	.name {
+		font-size: 24pt;
+	}
+
+	.character_info, .character_status {
+		border-bottom: 2px solid color-mix(in srgb, white 30%, transparent);
+		padding-bottom: 12px;
+		margin-bottom: 12px;
+	}
+
+	.character_status {
+
+	}
+
+	.character_fields {
+
+	}
+
+	.field_container {
+		display: inline-block;
+	}
+
+	label {
+		font-weight: bold;
+	}
+
+	label:after {
+		content: ':';
+	}
+
+	input {
+		margin-left: 8px;
+		background-color: transparent;
+		color: white;
+		border: none;
+		border-bottom: 1px dashed white;
+		width: calc(10ch + 8px);
+	}
+
+	input:focus-visible {
+		outline: none;
+	}
+
+	.sub_field_divider {
+		display: inline-block;
+		font-weight: bold;
+		margin-left: 12px;
+		margin-right: 6px;
+	}
+}
+
+.character_sheet {
+	table {
+		display: block;
+		background-color: color-mix(in srgb, white 15%, transparent);
+		float: left;
+		margin: 10px;
+		padding: 10px;
+		border: 1px solid color-mix(in srgb, white 25%, transparent);
+		border-radius: 5px;
+	}
+
+	tr:nth-child(2n) {
+		background-color: color-mix(in srgb, black 20%, transparent);
+	}
+
+	.group_header {
+		padding-bottom: 10px;
+		border-bottom: 1px solid white;
+		margin-bottom: 4px;
+		font-size: 16pt;
+	}
+
+	input {
+		margin-left: 8px;
+		background-color: transparent;
+		color: white;
+		border: none;
+		border-bottom: 1px dashed white;
+		width: calc(10ch + 8px);
+	}
+
+	input:focus-visible {
+		outline: none;
+	}
+}

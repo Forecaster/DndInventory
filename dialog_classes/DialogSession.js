@@ -1,0 +1,4 @@
+
+class DialogSession extends Dialog {
+
+}

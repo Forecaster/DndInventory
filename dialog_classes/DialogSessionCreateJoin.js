@@ -1,0 +1,2 @@
+
+class DialogSessionCreateJoin extends Dialog {}
