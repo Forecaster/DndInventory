@@ -1,0 +1,31 @@
+.input {
+	position: relative;
+}
+
+.history_anchor {
+	position: relative;
+}
+
+.history_viewer {
+	position: absolute;
+	display: none;
+	top: 0;
+	left: 0;
+	width: 100%;
+	background-color: #1e1e1e;
+	color: white;
+}
+
+.history_viewer .history_item {
+	padding: 4px;
+	cursor: pointer;
+}
+
+.history_viewer .history_item:nth-child(2n) {
+	background-color: color-mix(in srgb, black 25%, transparent);
+}
+
+.history_viewer .history_item:hover {
+	background-color: white;
+	color: black;
+}

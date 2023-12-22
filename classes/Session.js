@@ -14,9 +14,12 @@ class Session {
 	Players
 
 	CurrentUsername = null;
-	#GMSession = false;
-	#SessionToken
+	Token
+
+	/** @var {number} */
 	#PingTimerID
+	/** @var {int} */
+	#LastSync
 
 	static GenerateSessionID(callback) {
 		jQuery.post("api/get_new_session_id.php")
@@ -39,19 +42,31 @@ class Session {
 		this.Players = [];
 	}
 
+	toString() {
+		return JSON.stringify(this);
+	}
+
+	/**
+	 * @param {{ id:string, name:string, ruleset:string, encumbrance_option:int }} object
+	 * @returns {this}
+	 */
+	static fromJson(object) {
+		return new this(object.id, { name: object.name ?? null, ruleset: object.ruleset ?? null, encumbrance_option: object.encumbrance_option ?? 0 });
+	}
+
 	StartPingTimer() {
 		if (this.#PingTimerID !== null)
 			clearInterval(this.#PingTimerID);
 		const session = this;
 		this.#PingTimerID = setInterval(() => {
-			jQuery.post("api/session_ping.png", { id: session.ID, token: session.#SessionToken });
+			this.SyncCharacters();
 		}, 5000);
 	}
 
 	/**
 	 * @param {{ session_pwd:string, gm_pwd:string, success_callback:function, fail_callback:function }} options Fail callback receives an error message as the first parameter.
 	 */
-	CreateSession(options) {
+	RegisterSession(options) {
 		if (typeof options.success_callback !== "function")
 			options.success_callback = () => {};
 		if (typeof options.fail_callback !== "function")
@@ -69,7 +84,7 @@ class Session {
 			return;
 		}
 		console.debug("SessionCreate", options);
-		jQuery.post("api/session_create.php", { id: this.ID, name: this.Name, gm_pwd: options.gm_pwd, pwd: options.session_pwd, ruleset: this.Ruleset })
+		jQuery.post("api/session_create.php", { session_id: this.ID, name: this.Name, gm_pwd: options.gm_pwd, pwd: options.session_pwd, ruleset: this.Ruleset })
 			.done((payload) => {
 				payload = JSON.parse(payload);
 				console.debug(payload);
@@ -89,15 +104,16 @@ class Session {
 		if (typeof options.fail_callback !== "function")
 			options.fail_callback = () => {};
 		console.debug("LoadSession", options);
-		jQuery.post("api/session_load.php", { id: this.ID, gm_pwd: options.gm_pwd || null, pwd: options.pwd || null })
+		jQuery.post("api/session_load.php", { session_id: this.ID, gm_pwd: options.gm_pwd || null, pwd: options.pwd || null })
 			.done((payload) => {
 				payload = JSON.parse(payload);
 				console.debug(payload);
 				if (payload.result === 0) {
-					this.#GMSession = true;
+					this.Token = payload['data']['token'];
 					this.Name = payload['data']['session_data']['name'];
-					this.Ruleset = payload['data']['session_data']['ruleset'];
+					this.Ruleset = Ruleset[payload['data']['session_data']['ruleset']];
 					options.success_callback();
+					localStorage.setItem("session_token", this.Token);
 				} else
 					options.fail_callback(payload['msg']);
 			})
@@ -105,7 +121,7 @@ class Session {
 
 	/**
 	 *
-	 * @param {{ pwd:string, gm_pwd:string, success_callback:function, fail_callback:function }} options
+	 * @param {{ pwd:string, success_callback:function, fail_callback:function }} options
 	 */
 	JoinSession(options) {
 		if (typeof options.success_callback !== "function")
@@ -113,14 +129,12 @@ class Session {
 		if (typeof options.fail_callback !== "function")
 			options.fail_callback = () => {};
 		console.debug("JoinSession", options);
-		jQuery.post("api/session_join.php", { id: this.ID, username: this.CurrentUsername, gm_pwd: options.gm_pwd || null, pwd: options.pwd || null })
+		jQuery.post("api/session_join.php", { session_id: this.ID, username: this.CurrentUsername, pwd: options.pwd || null })
 			.done((payload) => {
 				payload = JSON.parse(payload);
 				console.debug(payload);
 				if (payload.result === 0) {
-					this.#SessionToken = payload.data.token;
-					if (payload.data.token.indexOf("GM_") === 0)
-						this.#GMSession = true;
+					this.Token = payload.data.token;
 					options.success_callback();
 				} else {
 					options.fail_callback(payload['msg']);
@@ -128,11 +142,28 @@ class Session {
 			})
 	}
 
-	SendAPIRequest(endpoint, data, options) {
+	SyncCharacters() {
+		jQuery.post("api/character_sync.php", { session_id: this.ID, username: this.CurrentUsername, token: this.Token, last_sync: this.#LastSync })
+			.done((payload) => {
+				/** @var {{ result:int, msg:string, data: { characters:object } }} */
+				payload = JSON.parse(payload);
+				console.debug(payload);
+				if (payload.result === 0) {
+					this.#LastSync = new Date().getTime();
+					const character_list = payload.data.characters;
+					console.debug(character_list);
 
-	}
+					characters = [];
 
-	GetRuleset() {
-		return this.Ruleset;
+					for (let id in character_list) {
+						const character = character_list[id];
+						let c = Serializable.Deserialize(character);
+						c.ID = id;
+						console.debug(c);
+						characters.push(c);
+					}
+					refresh_characters();
+				}
+			})
 	}
 }

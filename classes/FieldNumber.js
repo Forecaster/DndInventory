@@ -8,7 +8,6 @@ class FieldNumber extends Field {
 	constructor(label, options = {}) {
 		super(label, options);
 		this.Value = options.value || 0;
-		console.debug(options);
 		this.Min = typeof options.min !== "undefined" ? options.min : null;
 		this.Max = typeof options.max !== "undefined" ? options.max : null;
 	}
@@ -46,7 +45,6 @@ class FieldNumber extends Field {
 				}
 
 				input.onkeydown = (event) => {
-					console.log(event);
 					let action = false;
 					let t = event.target;
 					if (event.key === "Backspace")

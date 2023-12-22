@@ -1,4 +1,4 @@
-class Field {
+class Field extends Serializable {
 	/** @var {string} */
 	Label
 	/** @var {string} */
@@ -25,6 +25,7 @@ class Field {
 	 * @param {{ label_short:string, key:string, value:any, rollable:string, size:int, sub_field:Field, sub_field_divider:string, formula:string }} options
 	 */
 	constructor(label, options = {}) {
+		super();
 		this.Label = label;
 		this.LabelShort = options.label_short || null;
 		this.Key = options.key || null;

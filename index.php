@@ -20,6 +20,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="/libraries_javascript/jquery.min.js"></script>
 	<script src="/libraries_javascript/popper.min.js"></script>
 	<link rel="stylesheet" href="styles/main.css" />
+	<link rel="stylesheet" href="styles/inputs.css" />
 	<link rel="stylesheet" href="styles/inventory.css" />
 	<link rel="stylesheet" href="styles/character.css" />
 
@@ -32,6 +33,8 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="enums/SlotType.js"></script>
 
 	<!-- Classes -->
+	<script src="classes/API.js"></script>
+	<script src="classes/Serializable.js"></script>
 	<script src="classes/Drag_n_drop.js"></script>
 	<script src="classes/Character.js"></script>
 	<script src="classes/CharacterHealth.js"></script>
@@ -47,6 +50,9 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="classes/FieldNumber.js"></script>
 	<script src="classes/FieldCheckbox.js"></script>
 	<script src="classes/FieldGroup.js"></script>
+
+	<script src="classes/Test.js"></script>
+	<script src="classes/TestSub.js"></script>
 
 	<!-- Dialog classes -->
 	<script src="dialog_classes/Dialog.js"></script>
@@ -141,11 +147,11 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<div id="close" title="Close" class="close_button" onclick="dialog_create_character.Close();"></div>
 	<h2 class="center">Create character</h2>
 	<div class="row">
-		<div class="col-3">Name:</div>
+		<div class="col-3"><label for="dialog_create_character_name">Name:</label></div>
 		<div class="col"><input id="dialog_create_character_name" class="form-control" placeholder="Character name" /></div>
 	</div>
 	<div class="divider"></div>
-	<div class="center"><button class="btn btn-primary" onclick="dialog_create_character.Submit();">Create character</button></div>
+	<div class="center"><button class="btn btn-primary" onclick="dialog_create_character.Save();">Create character</button></div>
 </dialog>
 <dialog id="character_sheet" class="dialog character_sheet">
 	<div id="close" title="Close" class="close_button" onclick="dialog_character_sheet.Close();"></div>
@@ -213,6 +219,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	}, 100);
 
 	// <editor-fold desc="Setup variables">
+	/** @var {Session} */
 	let session = null;
 	/** @var {Character[]} */
 	let characters = [];
@@ -261,7 +268,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	equipment.AddSlot(new EquipmentSlot("Head top", 240, 10, SlotType.HeadTop));
 	equipment.AddSlot(new EquipmentSlot("Face", 240, 60, SlotType.Face));
 	equipment.AddSlot(new EquipmentSlot("Torso", 175, 160, SlotType.Body));
-	console.debug(equipment);
+	// console.debug(equipment);
 	// equipment.PopulateContainer(equipment_container);
 	//</editor-fold>
 </script>

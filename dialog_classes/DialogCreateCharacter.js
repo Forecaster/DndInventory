@@ -13,7 +13,8 @@ class DialogCreateCharacter extends Dialog {
 	}
 
 	Save() {
-		characters.push(new Character(this.FieldCharacterName.value, { fields: active_ruleset.GetFields(), pin_groups: active_ruleset.DefaultPins }));
+		characters.push(new Character(this.FieldCharacterName.value, { owner: session.CurrentUsername, fields: active_ruleset.GetFields(), pin_groups: active_ruleset.DefaultPins }));
+		this.FieldCharacterName.value = "";
 		refresh_characters();
 	}
 }

@@ -1,5 +1,5 @@
 
-class FieldGroup {
+class FieldGroup extends Serializable {
 	/** @var {string} */
 	Label
 	/** @var {Field[]} */
@@ -10,6 +10,7 @@ class FieldGroup {
 	 * @param {string} label
 	 */
 	constructor(label) {
+		super();
 		this.Label = label;
 		this.Fields = [];
 		for (let i = 1; i < arguments.length; i++) {

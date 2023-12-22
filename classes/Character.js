@@ -1,6 +1,10 @@
-class Character {
+class Character extends Serializable {
+	/** @var {string} */
+	ID
 	/** @var {string} */
 	Name
+	/** @var {string} */
+	Owner
 	/** @var {FieldGroup[]} */
 	Fields
 	/** @var {FieldGroup[]} */
@@ -20,10 +24,13 @@ class Character {
 
 	/**
 	 * @param {string} name
-	 * @param {{ fields:FieldGroup[], pin_groups:{} }} options
+	 * @param {{ id:string, owner:string, fields:FieldGroup[], pin_groups:{} }} options
 	 */
 	constructor(name, options = {}) {
+		super();
 		this.Name = name;
+		this.ID = options.id || null;
+		this.Owner = options.owner || null;
 		this.Fields = options.fields || active_ruleset.CharacterFields;
 		let inv_size = active_ruleset.InventorySize(session, this);
 		this.CharacterInventory = new Inventory("Backpack", { sectors: inv_size });
@@ -41,6 +48,10 @@ class Character {
 		});
 	}
 
+	toString() {
+		return this.Name;
+	}
+
 	static #GetKeyAndField(field) {
 		let items = {};
 		if (field.hasOwnProperty("Key") && field.Key !== null)
@@ -54,19 +65,6 @@ class Character {
 		return items;
 	}
 
-	toString() {
-		return this.Name;
-	}
-
-	Sync(name, level, health, fields, pin_groups) {
-		this.Name = name;
-		this.Level = level;
-		this.Health = health;
-		this.Fields = fields;
-		this.PinGroups = pin_groups;
-		this.LastSync = new Date();
-	}
-
 	GetQuickSheetElement() {
 		let container = document.createElement("div");
 
@@ -74,35 +72,15 @@ class Character {
 		name.innerText = this.Name;
 	}
 
-	/**
-	 * @param {string|{ name:string, level:int, health:{ max:int, current:int }, fields:FieldGroup[], fields_custom:FieldGroup[], pinned:{ name:string, fields:string[]}[] }} json
-	 * @constructor
-	 */
-	LoadJSON(json) {
-		if (typeof json === "string")
-			json = JSON.parse(json);
-		this.Name = json.name;
-		this.Level = json.level;
-		this.Health = new CharacterHealth(json.health.max, json.health.current);
-		this.Fields = json.fields;
-		this.FieldsCustom = json.fields_custom;
-		this.PinGroups = json.pinned;
-	}
-
-	GetJSON() {
-		return JSON.stringify({
-			name: this.Name,
-			level: this.Level,
-			health: this.Health,
-			fields: this.Fields,
-			fields_custom: this.FieldScustom,
-			pinned: this.PinGroups
-		});
-	}
-
 	Delete() {
-		let index = characters.indexOf(this);
-		characters.splice(index, 1);
+		const data = { session_id: session.ID, token: session.Token, character_id: this.ID, player: session.CurrentUsername };
+		API.Call("character_delete", data, {
+			success: (payload) => {
+				console.debug(payload);
+				let index = characters.indexOf(this);
+				characters.splice(index, 1);
+			}
+		})
 	}
 
 	/**
@@ -141,7 +119,9 @@ class Character {
 		let col1 = document.createElement("td");
 		col1.innerText = field.Label;
 		let col2 = document.createElement("td");
-		col2.appendChild(field.GetInput());
+		field.GetInput().forEach((element) => {
+			col2.appendChild(element);
+		});
 		return [col1, col2];
 	}
 
@@ -272,6 +252,20 @@ class Character {
 			fields.appendChild(notice);
 		}
 
+		let owner = document.createElement("div");
+		owner.innerText = "Belongs to " + (this.Owner ?? "GM");
+		update_target.appendChild(owner);
+
 		return update_target;
+	}
+
+	Upload() {
+		const data = { session_id: session.ID, player: session.CurrentUsername, token: session.Token, character_id: this.ID, character_data: this.Serialize() };
+		API.Call("character_save", data, {
+			success: (payload) => {
+				if (this.ID === null)
+					this.ID = payload.data.id;
+			}
+		})
 	}
 }

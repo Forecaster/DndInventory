@@ -62,3 +62,29 @@ function return_success_as_json(array $data = null,  bool $return_string = false
 function get_token(): string {
 	return hash('sha256', date("Y-m-d H:i:s"));
 }
+
+function validate_token(string $session_id, string $token, string $player): bool {
+	$token = $token . "_" . $player . ".token";
+	$session_path = __DIR__ . "/sessions/$session_id/tokens/";
+	if (file_exists($session_path)) {
+		$dir = opendir($session_path);
+		while ($f = readdir($dir)) {
+			if ($f === $token) {
+				$data = file_get_contents($session_path . $f);
+				$date = null;
+				try {
+					$date = new DateTime($data);
+					$diff = $date->diff(new DateTime());
+					if ($diff->h == 0)
+						return true;
+				} catch (Exception $e) {
+				}
+			}
+		}
+	}
+	return false;
+}
+
+function endswith($str, $substr) {
+	return strpos($str, $substr) === strlen($str) - strlen($substr);
+}
