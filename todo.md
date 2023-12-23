@@ -1,7 +1,13 @@
 * Character equipment slots
   * Single slot but expands to fit whatever size equipment is placed in it
 
-* [ ] Refactor characters
+* Controls and forms
+  * [ ] Implement a dropdown field
+  * [ ] Implement searchable dropdown field
+  * [ ] Fields should be usable outside of characters
+    * [ ] Enable styling the inputs differently by allow custom classes
+
+* Refactor characters
   * [ ] Implement saving and loading of characters (to backend)
     * [ ] Character changes are immediately saved.
   * [ ] Fields can be pinned from the full character sheet, which will display them on the compact sheet
@@ -14,12 +20,13 @@
   * [x] When the character is created it is added to the roster (The main screen), it can be opened to be viewed and edited (this is the same thing)
   * [x] "Fields" are presented better, with categories to group them
   * [ ] Allow updating a characters fields from a ruleset, which will try to match fields, and failing that will ask the user to map fields together
+  * [ ] Allow specifying custom controls in ruleset, such as "Take damage" for 5E, which would first remove temp. hp, then add wounds equal to the remaining damage
 
 * [ ] Finalize session implementation
-  * [ ] Add character storage to session (save/load)
-  * [ ] Implement character ownership
-    * [ ] Display owner on character card
+  * [x] Add character storage to session (save/load)
+  * [x] Implement character ownership
+    * [x] Display owner on character card
   * [ ] Implement popout for text inputs
     * [ ] Store history in localStorage
     * [ ] Popout should allow deleting entries from history
-    * [ ] Remember past session IDs and show in popout on ID inputs
+    * [x] Remember past session IDs and show in popout on ID inputs

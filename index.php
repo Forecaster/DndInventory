@@ -33,27 +33,24 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="enums/SlotType.js"></script>
 
 	<!-- Classes -->
-	<script src="classes/API.js"></script>
-	<script src="classes/Serializable.js"></script>
-	<script src="classes/Notifications.js"></script>
-	<script src="classes/Drag_n_drop.js"></script>
-	<script src="classes/Character.js"></script>
-	<script src="classes/CharacterHealth.js"></script>
-	<script src="classes/Inventory.js"></script>
-	<script src="classes/Item.js"></script>
-	<script src="classes/ItemSpawner.js"></script>
-	<script src="classes/EquipmentSlot.js"></script>
-	<script src="classes/EquipmentSlotGroup.js"></script>
-	<script src="classes/Tooltip.js"></script>
-	<script src="classes/Session.js"></script>
-	<script src="classes/Field.js"></script>
-	<script src="classes/FieldText.js"></script>
-	<script src="classes/FieldNumber.js"></script>
-	<script src="classes/FieldCheckbox.js"></script>
-	<script src="classes/FieldGroup.js"></script>
-
-	<script src="classes/Test.js"></script>
-	<script src="classes/TestSub.js"></script>
+	<script src="classes_structure/API.js"></script>
+	<script src="classes_structure/Drag_n_drop.js"></script>
+	<script src="classes_structure/ItemSpawner.js"></script>
+	<script src="classes_structure/Notifications.js"></script>
+	<script src="classes_structure/Tooltip.js"></script>
+	<script src="classes_data/Serializable.js"></script>
+	<script src="classes_data/Character.js"></script>
+	<script src="classes_data/CharacterHealth.js"></script>
+	<script src="classes_data/Inventory.js"></script>
+	<script src="classes_data/Item.js"></script>
+	<script src="classes_data/EquipmentSlot.js"></script>
+	<script src="classes_data/EquipmentSlotGroup.js"></script>
+	<script src="classes_data/Session.js"></script>
+	<script src="classes_data/Field.js"></script>
+	<script src="classes_data/FieldText.js"></script>
+	<script src="classes_data/FieldNumber.js"></script>
+	<script src="classes_data/FieldCheckbox.js"></script>
+	<script src="classes_data/FieldGroup.js"></script>
 
 	<!-- Dialog classes -->
 	<script src="dialog_classes/Dialog.js"></script>

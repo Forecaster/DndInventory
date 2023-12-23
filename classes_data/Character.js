@@ -16,6 +16,8 @@ class Character extends Serializable {
 	PinGroups
 	/** @var {Inventory} */
 	CharacterInventory
+	/** @var {string} */
+	Notes
 
 	/** @var {Number} */
 	UploadTimer
