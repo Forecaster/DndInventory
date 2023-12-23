@@ -56,6 +56,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<!-- Dialog classes -->
 	<script src="dialog_classes/Dialog.js"></script>
 	<script src="dialog_classes/DialogConfirm.js"></script>
+	<script src="dialog_classes/DialogAction.js"></script>
 	<script src="dialog_classes/DialogSession.js"></script>
 	<script src="dialog_classes/DialogCreateCharacter.js"></script>
 	<script src="dialog_classes/DialogCharacterSheet.js"></script>
@@ -73,6 +74,14 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 <dialog id="dialog_confirm" class="dialog">
 	<h2 id="confirm_title">Confirm title</h2>
 	<div id="confirm_container">
+	</div>
+</dialog>
+<dialog id="dialog_action" class="dialog">
+	<h4 id="dialog_action_title"></h4>
+	<table id="dialog_action_fields"></table>
+	<div>
+		<span class="btn btn-primary" id="dialog_action_go">TAKE ACTION</span>
+		<span class="btn btn-gray" id="dialog_action_cancel">CANCEL</span>
 	</div>
 </dialog>
 <!-- <editor-fold desc="Dialogs session"> -->
@@ -165,7 +174,10 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 </div>
 <div id="menu_side" class="menu_side">
 	<div class="menu_button" onclick="dialog_create_character.Open();">New Character</div>
-	<div class="menu_button">Items</div>
+<!--	<div class="menu_button">Items</div>-->
+	<div class="menu_divider"></div>
+	<div class="menu_label">Actions</div>
+	<div id="menu_container_actions"></div>
 </div>
 <div class="main_container">
 <!--	<div id="equipment_container" style="background-image: url('images/character.png'); width: 408px; height: 503px; position: relative; float: left;"></div>-->
@@ -203,6 +215,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	const dialog_character_sheet = new DialogCharacterSheet("#character_sheet");
 
 	const dialog_confirm = new DialogConfirm("#dialog_confirm");
+	const dialog_action = new DialogAction("#dialog_action");
 
 	const textarea_notes = document.createElement("textarea");
 	let textarea_notes_timeout = null;
@@ -229,6 +242,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	const clock_real = document.querySelector("#clock_real");
 	// </editor-fold>
 
+	// <editor-fold desc="Clock timer">
 	setInterval(() => {
 		const date = new Date();
 		let hours = date.getHours();
@@ -242,6 +256,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 			min = "0" + min;
 		clock_real.innerText = `${hours}:${min} ${am}`;
 	}, 100);
+	// </editor-fold>
 
 	// <editor-fold desc="Setup variables">
 	/** @var {Session} */

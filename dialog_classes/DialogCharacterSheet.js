@@ -42,11 +42,12 @@ class DialogCharacterSheet extends Dialog {
 				col1.appendChild(field.GetLabel());
 				row.appendChild(col1);
 
-				field.GetInput().forEach((input) => {
-					let col = document.createElement("td");
-					col.appendChild(input);
-					row.appendChild(col);
-				});
+				function keyup(event) {
+					character.SetField(event.currentTarget.getAttribute("field-label"), event.currentTarget.value);
+				}
+				let col2 = document.createElement("td");
+				row.appendChild(col2);
+				field.AppendInput(col2, { callbacks: { onkeyup: keyup } });
 			});
 		});
 	}

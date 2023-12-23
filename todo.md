@@ -6,6 +6,8 @@
   * [ ] Implement searchable dropdown field
   * [ ] Fields should be usable outside of characters
     * [ ] Enable styling the inputs differently by allow custom classes
+  * [ ] Add dice roller widget (get dice values from ruleset along with common modifiers (advantage, disadvantage, etc)?)
+    * [ ] Add ability to apply result of dice to field (drag n drop?)
 
 * Refactor characters
   * [ ] Implement saving and loading of characters (to backend)
@@ -20,7 +22,13 @@
   * [x] When the character is created it is added to the roster (The main screen), it can be opened to be viewed and edited (this is the same thing)
   * [x] "Fields" are presented better, with categories to group them
   * [ ] Allow updating a characters fields from a ruleset, which will try to match fields, and failing that will ask the user to map fields together
-  * [ ] Allow specifying custom controls in ruleset, such as "Take damage" for 5E, which would first remove temp. hp, then add wounds equal to the remaining damage
+  * [x] Allow specifying custom controls in ruleset, such as "Take damage" for 5E, which would first remove temp. hp, then add wounds equal to the remaining damage
+  * [ ] Fix field interactions (multiple characters with the same fields in the card would cause cross-updating)
+  * [ ] Implement field formulas (referencing other fields to calculate values)
+    * [ ] To view/edit the formula a small button should be present on the field (shown on hover), clicking the button shows a popover with a textarea to edit the field
+      * [ ] The formula popover could have a list of keys on the side for quick reference, clicking a key inserts it into the textarea at the cursor
+    * [ ] Field using formula will not allow manual editing
+  * [ ] Implement field key interactions (when field changes, update other fields that use the key)
 
 * [ ] Finalize session implementation
   * [x] Add character storage to session (save/load)

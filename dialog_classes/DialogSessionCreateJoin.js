@@ -1,5 +1,13 @@
 
 class DialogSessionCreateJoin extends Dialog {
+
+	constructor(selector_or_element, options) {
+		super(selector_or_element, options);
+		this.DialogElement.addEventListener("keydown", (event) => {
+			if (event.key === "Escape")
+				event.preventDefault();
+		})
+	}
 	Open() {
 		session = Session.RetrievePreviousSession();
 		session.ResumeSession({

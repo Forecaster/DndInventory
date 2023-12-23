@@ -116,6 +116,7 @@ class Session {
 			success: (payload) => {
 				this.Mode = "load";
 				this.StorePreviousSession(payload.data.token);
+				this.SessionStart();
 				options.success_callback(payload);
 			},
 			fail: (result, msg) => {
@@ -141,7 +142,8 @@ class Session {
 				this.StorePreviousSession(payload.data.token);
 				this.Name = payload.data.session_data.name;
 				this.Ruleset = Ruleset[payload.data.session_data.ruleset];
-				options.success_callback();
+				this.SessionStart();
+				options.success_callback(payload);
 			},
 			fail: (result, msg) => {
 				options.fail_callback(result, msg);
@@ -166,6 +168,7 @@ class Session {
 			success: (payload) => {
 				this.StorePreviousSession(payload.data.token);
 				options.success_callback(payload);
+				this.SessionStart();
 			},
 			fail: (result, msg) => {
 				options.fail_callback(result, msg);
@@ -200,6 +203,7 @@ class Session {
 				this.Name = payload.data.session_data.name;
 				this.Ruleset = payload.data.session_data.ruleset;
 				options.success_callback(payload);
+				this.SessionStart();
 			},
 			fail: (result, msg) => {
 				options.fail_callback(result, msg, silent);
@@ -229,5 +233,20 @@ class Session {
 				notifications.Success(`${characters.length} character${characters.length===1?"":"s"} loaded from server!`);
 			}
 		});
+	}
+
+	SessionStart() {
+		const container = document.getElementById("menu_container_actions")
+		container.innerHTML = "";
+
+		active_ruleset.Actions.forEach((action) => {
+			let btn = document.createElement("div");
+			btn.classList.add("menu_button");
+			btn.innerText = action.label;
+			btn.addEventListener("click", () => {
+				dialog_action.Open(action);
+			});
+			container.appendChild(btn);
+		})
 	}
 }

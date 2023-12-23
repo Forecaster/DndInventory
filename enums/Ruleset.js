@@ -8,6 +8,8 @@ class Ruleset {
 	CharacterFields
 	/** @var {{ name:string, fields:string[] }[]} */
 	DefaultPins
+	/** @var {{ label:string, icon:string, key:string, fields:string[], action:function(character:Character, fields:object) }[]} */
+	Actions
 	/** @var {Function} */
 	LevelFormula
 	/** @var {Function} */
@@ -58,6 +60,8 @@ class Ruleset {
 				new FieldText("Walk speed"),
 				new FieldText("Swim speed"),
 				new FieldText("Fly speed"),
+				new FieldText("Resistances"),
+				new FieldText("Immunities"),
 				new FieldNumber("Armor class", { label_short: "AC", key: "ac", size: 3 }),
 				new FieldText("Hit dice", { key: "hd", size: 2 }),
 				new FieldNumber("Wounds", { label_short: "W", key: "wounds", size: 3, sub_field: new FieldNumber("Hit points", { label_short: "Max", key: "hpmax", size: 3 }), sub_field_divider: "/" }),
@@ -67,6 +71,52 @@ class Ruleset {
 		default_pins: [
 			{name: "info", fields: ["Race", "Class", "Background", "Proficiency Bonus"]},
 			{name: "status", fields: ["Armor Class", "Wounds", "Temporary Hit points"]}
+		],
+		actions: [
+			{ label: "Take damage", icon: "game-icons/carl-olsen/crossbow.png", key: "damage",
+				fields: [
+					"Magical:number",
+					"Acid:number",
+					"Bludgeoning:number",
+					"Cold:number",
+					"Fire:number",
+					"Force:number",
+					"Lightning:number",
+					"Necrotic:number",
+					"Piercing:number",
+					"Poison:number",
+					"Psychic:number",
+					"Radiant:number",
+					"Slashing:number",
+					"Thunder:number"
+				], action: (character, fields) => {
+					const resistant = character.GetField("Resistances", "");
+					const immune = character.GetField("Immunities", "");
+					let total_damage = 0;
+					for (let field in fields) {
+						let val = parseFloat(fields[field]);
+						if (isNaN(val))
+							val = 0;
+						if (resistant.toLowerCase().indexOf(field.toLowerCase()) !== -1)
+							val = Math.floor(val * .5);
+						if (immune.toLowerCase().indexOf(field.toLowerCase()) !== -1)
+							val = 0;
+						total_damage += val;
+					}
+					console.debug(character);
+					console.debug(fields, total_damage);
+					let temp_hp = character.GetField("Temporary Hit points", 0);
+					console.debug("temp", temp_hp);
+					let diff = temp_hp - total_damage;
+					console.debug("diff", diff);
+					if (diff >= 0)
+						character.SetField("Temporary Hit points", diff);
+					else {
+						character.SetField("Temporary Hit points", 0);
+						diff *= -1;
+						character.SetField("Wounds", character.GetField("Wounds", 0) + diff);
+					}
+				}}
 		],
 		/**
 		 * @param {Ruleset} current_ruleset
@@ -128,7 +178,8 @@ class Ruleset {
 	 * skill_bonus_formula:function,
 	 * max_hit_points_formula:function,
 	 * inventory_size_formula:string,
-	 * default_pins:{ name:string, fields:string[] }[]
+	 * default_pins:{ name:string, fields:string[] }[],
+	 * actions:{ label:string, icon:string, key:string, fields:string[], action:function(character:Character, fields:object)}[],
 	 * }} options
 	 * Omitted options are assigned null values.
 	 * @constructor
@@ -136,12 +187,13 @@ class Ruleset {
 	constructor(id, name, options = {}) {
 		this.ID = id;
 		this.Name = name;
-		this.CharacterFields = options.character_fields || null;
-		this.LevelFormula = options.level_formula || null;
-		this.MaxHitPointsFormula = options.max_hit_points_formula || null;
-		this.InventorySizeFormula = options.inventory_size_formula || null;
-		this.EncumbranceOptions = options.encumbrance_options || null;
-		this.DefaultPins = options.default_pins || {};
+		this.CharacterFields = options.character_fields ?? null;
+		this.LevelFormula = options.level_formula ?? null;
+		this.MaxHitPointsFormula = options.max_hit_points_formula ?? null;
+		this.InventorySizeFormula = options.inventory_size_formula ?? null;
+		this.EncumbranceOptions = options.encumbrance_options ?? null;
+		this.DefaultPins = options.default_pins ?? {};
+		this.Actions = options.actions ?? []
 	}
 
 	/**

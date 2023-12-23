@@ -130,9 +130,15 @@ class Character extends Serializable {
 		return [col1, col2];
 	}
 
+	/**
+	 * @param {Field} field
+	 * @param {string} label
+	 * @param {Any} value
+	 */
 	static #SetField(field, label, value) {
 		if (field.Label === label) {
 			field.Value = value;
+			field.Refresh();
 			return true;
 		} else if (field.SubField !== null) {
 			return this.#SetField(field.SubField, label, value);
@@ -158,15 +164,16 @@ class Character extends Serializable {
 	}
 
 	GetField(label, default_value = null) {
+		let value = default_value;
 		if (Array.isArray(this.Fields)) {
 			this.Fields.forEach((group) => {
 				group.Fields.forEach((field) => {
 					if (field.Label === label)
-						return field.Value;
+						value = field.Value;
 				});
 			});
 		}
-		return default_value;
+		return value;
 	}
 
 	GetCompactElement(update_target = null) {

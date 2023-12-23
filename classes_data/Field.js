@@ -79,7 +79,7 @@ class Field extends Serializable {
 	}
 
 	/**
-	 * @param {{ callbacks:{ onblur:function, onfocus:function, onkeydown:function, onkeyup:function } }} options
+	 * @param {{ ignore_sub_field:boolean, callbacks:{ onblur:function, onfocus:function, onkeydown:function, onkeyup:function } }} options
 	 * @returns {HTMLInputElement[]}
 	 */
 	GetInput(options = {}) {
@@ -110,9 +110,27 @@ class Field extends Serializable {
 		if (typeof this.Value !== "undefined" && this.Value !== null)
 			input.value = this.Value.toString();
 		inputs.push(input);
-		if (this.SubField !== null)
+		if (this.SubField !== null && !options.ignore_sub_field)
 			inputs = inputs.concat(this.SubField.GetInput(options));
 		return inputs;
+	}
+
+	/**
+	 * @param {HTMLElement} container
+	 * @param {{ callbacks:{ onblur:function, onfocus:function, onkeydown:function, onkeyup:function } }} options
+	 * @constructor
+	 */
+	AppendInput(container, options = {}) {
+		options.ignore_sub_field = true;
+		const input = this.GetInput(options)[0];
+		container.appendChild(input);
+		if (this.SubField !== null) {
+			const divider = document.createElement("span");
+			divider.innerText = this.SubFieldDivider;
+			divider.style.marginLeft = "8px";
+			container.appendChild(divider);
+			this.SubField.AppendInput(container, options);
+		}
 	}
 
 	/**
@@ -134,6 +152,13 @@ class Field extends Serializable {
 			formula: this.Formula,
 			label_short: this.LabelShort,
 		});
+	}
+
+	Refresh() {
+		const elements = Array.from(document.querySelectorAll(`[field-label='${this.Label}']`));
+		elements.forEach((element) => {
+			element.value = this.Value;
+		})
 	}
 
 	ParseFormula() {
