@@ -17,6 +17,8 @@ class Character extends Serializable {
 	/** @var {Inventory} */
 	CharacterInventory
 
+	/** @var {Number} */
+	UploadTimer
 	/** @var {Date} */
 	LastSync
 	/** @var {{ key, Field }} */
@@ -74,7 +76,8 @@ class Character extends Serializable {
 
 	Delete() {
 		const data = { session_id: session.ID, token: session.Token, character_id: this.ID, player: session.CurrentUsername };
-		API.Call("character_delete", data, {
+		API.Call("character_delete", {
+			data: data,
 			success: (payload) => {
 				console.debug(payload);
 				let index = characters.indexOf(this);
@@ -125,6 +128,32 @@ class Character extends Serializable {
 		return [col1, col2];
 	}
 
+	SetField(label, value) {
+		if (Array.isArray(this.Fields)) {
+			this.Fields.forEach((group) => {
+				group.Fields.forEach((field) => {
+					if (field.Label === label) {
+						field.Value = value;
+						this.PrimeUpload();
+						return null;
+					}
+				});
+			});
+		}
+	}
+
+	GetField(label, default_value = null) {
+		if (Array.isArray(this.Fields)) {
+			this.Fields.forEach((group) => {
+				group.Fields.forEach((field) => {
+					if (field.Label === label)
+						return field.Value;
+				});
+			});
+		}
+		return default_value;
+	}
+
 	GetCompactElement(update_target = null) {
 		let name;
 		let info;
@@ -134,6 +163,16 @@ class Character extends Serializable {
 			update_target = document.createElement("div");
 			update_target.classList.add("character_compact");
 			update_target.id = "character_" + this.Name.toLowerCase();
+			let field_update_timer = null;
+			update_target.onkeydown = (event) => {
+				console.debug(event);
+				clearTimeout(field_update_timer);
+				field_update_timer = setTimeout(() => {
+					let field = event.target.getAttribute("field-label");
+					if (typeof field !== "undefined" && field !== null)
+						this.SetField(field, event.target.value.trim());
+				}, 500);
+			};
 
 			let control_container = document.createElement("div");
 			control_container.classList.add("control_container");
@@ -202,12 +241,12 @@ class Character extends Serializable {
 
 		info.innerHTML = "";
 		info_fields.forEach((field) => {
-			info.appendChild(field.GetField());
+			info.appendChild(field.GetField({ short_label: true }));
 		});
 
 		status.innerHTML = "";
 		status_fields.forEach((field) => {
-			status.appendChild(field.GetField());
+			status.appendChild(field.GetField({ short_label: true }));
 		})
 
 		name.innerText = this.Name;
@@ -253,19 +292,30 @@ class Character extends Serializable {
 		}
 
 		let owner = document.createElement("div");
-		owner.innerText = "Belongs to " + (this.Owner ?? "GM");
+		owner.innerText = "This character belongs to " + (this.Owner ?? "GM");
 		update_target.appendChild(owner);
 
 		return update_target;
 	}
 
 	Upload() {
+		console.debug("Character upload", this);
 		const data = { session_id: session.ID, player: session.CurrentUsername, token: session.Token, character_id: this.ID, character_data: this.Serialize() };
-		API.Call("character_save", data, {
+		API.Call("character_save", {
+			data: data,
 			success: (payload) => {
-				if (this.ID === null)
+				if (this.ID === null || this.ID === "")
 					this.ID = payload.data.id;
+				notifications.Success(`Character '${this.Name}' saved!`);
 			}
 		})
+	}
+
+	PrimeUpload() {
+		console.debug("Primed character upload...");
+		clearTimeout(this.UploadTimer);
+		this.UploadTimer = setTimeout(() => {
+			this.Upload();
+		}, 5 * 1000);
 	}
 }

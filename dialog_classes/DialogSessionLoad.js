@@ -63,18 +63,22 @@ class DialogSessionLoad extends Dialog {
 	Save() {
 		session = new Session(this.ElementSessionID.value);
 		session.LoadSession({ gm_pwd: this.ElementGMPassword.value, success_callback: (() => {
-			let history = localStorage.getItem("history_session_id");
-			if (history !== null) {
-				history = JSON.parse(history);
-			} else {
-				history = [];
-			}
-			if (history.indexOf(this.ElementSessionID.value) === -1)
-				history.push(this.ElementSessionID.value);
-			localStorage.setItem("history_session_id", JSON.stringify(history));
-			this.Close();
-			dialog_session_create_join.Close();
-			session.SyncCharacters();
-		}) });
+				let history = localStorage.getItem("history_session_id");
+				if (history !== null) {
+					history = JSON.parse(history);
+				} else {
+					history = [];
+				}
+				if (history.indexOf(this.ElementSessionID.value) === -1)
+					history.push(this.ElementSessionID.value);
+				localStorage.setItem("history_session_id", JSON.stringify(history));
+				this.Close();
+				dialog_session_create_join.Close();
+				session.SyncCharacters();
+			}),
+			fail_callback: ((result, msg) => {
+				notifications.SendError(msg);
+			})
+		});
 	}
 }

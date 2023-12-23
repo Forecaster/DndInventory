@@ -33,7 +33,7 @@ class Serializable {
 	}
 
 	static #DeserializeArray(array) {
-		console.debug("DeserializeArray", array);
+	// 	console.debug("DeserializeArray", array);
 		let output = [];
 		array.forEach((item) => {
 			if (typeof item === "string") {
@@ -53,7 +53,7 @@ class Serializable {
 				output.push(item);
 			}
 		})
-		console.debug("output", output);
+		// console.debug("output", output);
 		return output;
 	}
 

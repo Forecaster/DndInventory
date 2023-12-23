@@ -35,6 +35,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<!-- Classes -->
 	<script src="classes/API.js"></script>
 	<script src="classes/Serializable.js"></script>
+	<script src="classes/Notifications.js"></script>
 	<script src="classes/Drag_n_drop.js"></script>
 	<script src="classes/Character.js"></script>
 	<script src="classes/CharacterHealth.js"></script>
@@ -69,6 +70,8 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="enums/Ruleset.js"></script>
 </head>
 <body>
+<div id="notification_container" class="notifications_container" popover>
+</div>
 <dialog id="dialog_confirm" class="dialog">
 	<h2 id="confirm_title">Confirm title</h2>
 	<div id="confirm_container">
@@ -191,6 +194,8 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	const shop = document.querySelector("#shop");
 	const equipment_container = document.querySelector("#equipment_container");
 
+	const notifications = new Notifications("#notification_container");
+
 	const dialog_session_create_join = new DialogSessionCreateJoin("#session_create_join");
 	const dialog_session_create = new DialogSessionCreate("#session_create", { external_buttons: { open: [ "#session_create_open" ] } });
 	const dialog_session_load = new DialogSessionLoad("#session_load", { external_buttons: { open: [ "#session_load_open" ] } });
@@ -271,4 +276,5 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	// console.debug(equipment);
 	// equipment.PopulateContainer(equipment_container);
 	//</editor-fold>
+
 </script>

@@ -22,11 +22,12 @@ class Session {
 	#LastSync
 
 	static GenerateSessionID(callback) {
-		jQuery.post("api/get_new_session_id.php")
-			.done((payload) => {
+		API.Call("get_new_session_id", {
+			success: (payload) => {
 				if (typeof callback === "function")
-					callback(JSON.parse(payload));
-			})
+					callback(payload);
+			}
+		});
 	}
 
 	/**
@@ -84,15 +85,16 @@ class Session {
 			return;
 		}
 		console.debug("SessionCreate", options);
-		jQuery.post("api/session_create.php", { session_id: this.ID, name: this.Name, gm_pwd: options.gm_pwd, pwd: options.session_pwd, ruleset: this.Ruleset })
-			.done((payload) => {
-				payload = JSON.parse(payload);
-				console.debug(payload);
-				if (payload.result === 0)
-					options.success_callback();
-				else
-					options.fail_callback(payload['msg']);
-			})
+		const data = { session_id: this.ID, name: this.Name, gm_pwd: options.gm_pwd, pwd: options.session_pwd, ruleset: this.Ruleset };
+		API.Call("session_create", data, {
+			data: data,
+			success: () => {
+				options.success_callback();
+			},
+			fail: (result, msg) => {
+				options.fail_callback(result, msg);
+			}
+		});
 	}
 
 	/**
@@ -104,19 +106,21 @@ class Session {
 		if (typeof options.fail_callback !== "function")
 			options.fail_callback = () => {};
 		console.debug("LoadSession", options);
-		jQuery.post("api/session_load.php", { session_id: this.ID, gm_pwd: options.gm_pwd || null, pwd: options.pwd || null })
-			.done((payload) => {
-				payload = JSON.parse(payload);
-				console.debug(payload);
-				if (payload.result === 0) {
-					this.Token = payload['data']['token'];
-					this.Name = payload['data']['session_data']['name'];
-					this.Ruleset = Ruleset[payload['data']['session_data']['ruleset']];
-					options.success_callback();
-					localStorage.setItem("session_token", this.Token);
-				} else
-					options.fail_callback(payload['msg']);
-			})
+		const data = { session_id: this.ID, gm_pwd: options.gm_pwd || null, pwd: options.pwd || null };
+		API.Call("session_load",{
+			data: data,
+			/** @var {{ data:{ token:string, session_data:{ name:string, ruleset:string }}}} payload */
+			success: (payload) => {
+				this.Token = payload.data.token;
+				this.Name = payload.data.session_data.name;
+				this.Ruleset = Ruleset[payload.data.session_data.ruleset];
+				options.success_callback();
+				localStorage.setItem("session_token", this.Token);
+			},
+			fail: (result, msg) => {
+				options.fail_callback(result, msg);
+			}
+		});
 	}
 
 	/**
@@ -129,41 +133,41 @@ class Session {
 		if (typeof options.fail_callback !== "function")
 			options.fail_callback = () => {};
 		console.debug("JoinSession", options);
-		jQuery.post("api/session_join.php", { session_id: this.ID, username: this.CurrentUsername, pwd: options.pwd || null })
-			.done((payload) => {
-				payload = JSON.parse(payload);
-				console.debug(payload);
-				if (payload.result === 0) {
-					this.Token = payload.data.token;
-					options.success_callback();
-				} else {
-					options.fail_callback(payload['msg']);
-				}
-			})
+		const data = { session_id: this.ID, username: this.CurrentUsername, pwd: options.pwd || null };
+		API.Call("session_join", {
+			data: data,
+			success: () => {
+				this.Token = payload.data.token;
+				options.success_callback();
+			},
+			fail: (result, msg) => {
+				options.fail_callback(msg);
+			}
+		});
 	}
 
 	SyncCharacters() {
-		jQuery.post("api/character_sync.php", { session_id: this.ID, username: this.CurrentUsername, token: this.Token, last_sync: this.#LastSync })
-			.done((payload) => {
-				/** @var {{ result:int, msg:string, data: { characters:object } }} */
-				payload = JSON.parse(payload);
-				console.debug(payload);
-				if (payload.result === 0) {
-					this.#LastSync = new Date().getTime();
-					const character_list = payload.data.characters;
-					console.debug(character_list);
+		const data = { session_id: this.ID, username: this.CurrentUsername, token: this.Token, last_sync: this.#LastSync };
+		/** @var {{ result:number, msg:string, data:{ characters:object } }} payload */
+		API.Call("character_sync", {
+			data: data,
+			success: (payload) => {
+				this.#LastSync = new Date().getTime();
+				const character_list = payload.data.characters;
+				console.debug(character_list);
 
-					characters = [];
+				characters = [];
 
-					for (let id in character_list) {
-						const character = character_list[id];
-						let c = Serializable.Deserialize(character);
-						c.ID = id;
-						console.debug(c);
-						characters.push(c);
-					}
-					refresh_characters();
+				for (let id in character_list) {
+					const character = character_list[id];
+					let c = Serializable.Deserialize(character);
+					c.ID = id;
+					console.debug(c);
+					characters.push(c);
 				}
-			})
+				refresh_characters();
+				notifications.Success(`${characters.length} character${characters.length===1?"":"s"} loaded from server!`);
+			}
+		});
 	}
 }

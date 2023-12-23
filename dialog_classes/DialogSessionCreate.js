@@ -49,21 +49,20 @@ class DialogSessionCreate extends Dialog {
 	}
 
 	Save() {
-		jQuery.post("api/session_create.php", {
-			id: this.ElementSessionID.value,
+		session = new Session(this.ElementSessionID.value, {
 			name: this.ElementSessionName.value,
-			gm_pwd: this.ElementGMPassword.value,
-			pwd: this.ElementSessionPassword.value,
 			ruleset: this.ElementRuleset.value
-		}).done((payload) => {
-			/** @var {{ result:int, msg:string, data: { session_data:{ id:string, name:string, ruleset:string }, path:string } }} payload */
-			payload = JSON.parse(payload);
-			console.debug(payload);
-			if (payload.result === 0) {
-				let session_data = payload.data.session_data
-				session = new Session(session_data.id, { name: session_data.name, ruleset: session_data.ruleset });
+		});
+		session.RegisterSession({
+			gm_pwd: this.ElementGMPassword.value,
+			session_pwd: this.ElementSessionPassword.value,
+			success_callback: () => {
 				this.Close();
 				dialog_session_create_join.Close();
+				notifications.Success("New session has been created!");
+			},
+			fail_callback: (result, msg) => {
+				notifications.Error(msg);
 			}
 		})
 	}

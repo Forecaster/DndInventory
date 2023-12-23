@@ -26,19 +26,20 @@ class Field extends Serializable {
 	 */
 	constructor(label, options = {}) {
 		super();
+		console.debug(options);
 		this.Label = label;
-		this.LabelShort = options.label_short || null;
-		this.Key = options.key || null;
-		this.Rollable = options.rollable || null;
-		this.Size = options.size || null;
-		this.SubField = options.sub_field || null;
-		this.SubFieldDivider = options.sub_field_divider || "";
-		this.Value = options.value || null;
-		this.Formula = options.formula || null;
+		this.LabelShort = options.label_short ?? null;
+		this.Key = options.key ?? null;
+		this.Rollable = options.rollable ?? null;
+		this.Size = options.size ?? null;
+		this.SubField = options.sub_field ?? null;
+		this.SubFieldDivider = options.sub_field_divider ?? "";
+		this.Value = options.value ?? null;
+		this.Formula = options.formula ?? null;
 	}
 
 	/**
-	 * @param {{ short_label:boolean }} options
+	 * @param {{ short_label:boolean, force_short_label:boolean }} options
 	 * @return {HTMLDivElement}
 	 */
 	GetField(options = {}) {
@@ -62,18 +63,24 @@ class Field extends Serializable {
 	}
 
 	/**
-	 * @param {{ short_label:boolean }} options
+	 * @param {{ short_label:boolean, force_short_label:boolean }} options
 	 * @return {HTMLLabelElement}
 	 */
 	GetLabel(options = {}) {
 		let label = document.createElement("label");
 		label.for = "field_" + (this.Key || this.Label);
-		label.innerText = (options.short_label ? this.LabelShort || this.Label.substring(0, 3) : this.Label );
+		label.innerText = this.Label;
+		if (options.short_label) {
+			if (this.LabelShort !== null && this.LabelShort.length > 0)
+				label.innerText = this.LabelShort;
+			else if (options.force_short_label)
+				label.innerText = this.Label.substring(0, 3);
+		}
 		return label;
 	}
 
 	/**
-	 * @param {{}} options
+	 * @param {{ callbacks:{ onblur:function, onfocus:function, onkeydown:function, onkeyup:function } }} options
 	 * @returns {HTMLInputElement[]}
 	 */
 	GetInput(options = {}) {
@@ -81,10 +88,20 @@ class Field extends Serializable {
 		let input = document.createElement("input");
 		input.id = "field_" + (this.Key || this.Label);
 		input.setAttribute("field-type", this.constructor.name);
-		input.setAttribute("label", this.Label);
-		input.setAttribute("key", this.Key);
+		input.setAttribute("field-label", this.Label);
+		input.setAttribute("field-key", this.Key);
 		input.title = this.Label;
 		input.classList.add("field");
+		if (options.hasOwnProperty("callbacks")) {
+			if (options.callbacks.hasOwnProperty("onblur"))
+				input.onblur = options.callbacks.onblur;
+			if (options.callbacks.hasOwnProperty("onfocus"))
+				input.onfocus = options.callbacks.onfocus;
+			if (options.callbacks.hasOwnProperty("onkeydown"))
+				input.onkeydown = options.callbacks.onkeydown;
+			if (options.callbacks.hasOwnProperty("onkeyup"))
+				input.onkeyup = options.callbacks.onkeyup;
+		}
 		if (this.Size)
 			input.style.width = "calc(" + this.Size + "ch + 8px)";
 		if (this.Rollable)
@@ -114,6 +131,7 @@ class Field extends Serializable {
 			value: this.Value,
 			size: this.Size,
 			formula: this.Formula,
+			label_short: this.LabelShort,
 		});
 	}
 

@@ -6,6 +6,7 @@ class FieldNumber extends Field {
 	Max
 
 	constructor(label, options = {}) {
+		console.debug(options);
 		super(label, options);
 		this.Value = options.value || 0;
 		this.Min = typeof options.min !== "undefined" ? options.min : null;
