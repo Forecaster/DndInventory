@@ -2,7 +2,6 @@
 class DialogSessionCreateJoin extends Dialog {
 	Open() {
 		session = Session.RetrievePreviousSession();
-		console.debug(session);
 		session.ResumeSession({
 			silent_fail: true,
 			success_callback: (payload) => {

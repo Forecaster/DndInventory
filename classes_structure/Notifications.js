@@ -41,7 +41,9 @@ class Notifications {
 		this.Container.appendChild(element);
 		this.Container.showPopover();
 		setTimeout(() => {
-			this.Container.removeChild(element);
+			try {
+				this.Container.removeChild(element);
+			} catch (e) {}
 		}, (duration * 1000) + 5100);
 	}
 

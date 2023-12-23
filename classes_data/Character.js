@@ -186,6 +186,7 @@ class Character extends Serializable {
 			field_update_timer = setTimeout(field_update_function, 500);
 		};
 
+		let character = this;
 		let name;
 		let info;
 		let status;
@@ -200,6 +201,15 @@ class Character extends Serializable {
 			control_container.classList.add("control_container");
 			update_target.appendChild(control_container);
 
+			let notes = document.createElement("div");
+			notes.classList.add("character_notes");
+			notes.title = "Character notes";
+			notes.onclick = (event) => {
+				event.stopPropagation();
+				popout_character_notes.Show({ event: event, target: character });
+			}
+			control_container.appendChild(notes);
+
 			let open = document.createElement("div");
 			open.classList.add("open_sheet");
 			open.title = "Open sheet";
@@ -209,7 +219,6 @@ class Character extends Serializable {
 			let del = document.createElement("div");
 			del.classList.add("delete_character");
 			del.title = "Delete character";
-			let character = this;
 			function delete_me() {
 				character.Delete();
 				update_target.parentElement.removeChild(update_target);
@@ -259,7 +268,6 @@ class Character extends Serializable {
 				}
 			});
 		});
-		console.debug(info_fields, status_fields, custom_groups);
 
 		info.innerHTML = "";
 		info_fields.forEach((field) => {

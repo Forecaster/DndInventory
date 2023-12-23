@@ -218,15 +218,11 @@ class Session {
 			success: (payload) => {
 				this.#LastSync = new Date().getTime();
 				const character_list = payload.data.characters;
-				console.debug(character_list);
-
 				characters = [];
-
 				for (let id in character_list) {
 					const character = character_list[id];
 					let c = Serializable.Deserialize(character);
 					c.ID = id;
-					console.debug(c);
 					characters.push(c);
 				}
 				refresh_characters();

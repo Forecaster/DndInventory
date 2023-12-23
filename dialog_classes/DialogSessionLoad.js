@@ -77,7 +77,7 @@ class DialogSessionLoad extends Dialog {
 				session.SyncCharacters();
 			}),
 			fail_callback: ((result, msg) => {
-				notifications.SendError(msg);
+				notifications.Error(msg);
 			})
 		});
 	}

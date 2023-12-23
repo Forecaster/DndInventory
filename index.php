@@ -38,6 +38,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="classes_structure/ItemSpawner.js"></script>
 	<script src="classes_structure/Notifications.js"></script>
 	<script src="classes_structure/Tooltip.js"></script>
+	<script src="classes_structure/PopoutElement.js"></script>
 	<script src="classes_data/Serializable.js"></script>
 	<script src="classes_data/Character.js"></script>
 	<script src="classes_data/CharacterHealth.js"></script>
@@ -67,8 +68,8 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="enums/Ruleset.js"></script>
 </head>
 <body>
-<div id="notification_container" class="notifications_container" popover>
-</div>
+<div id="notification_container" class="notifications_container" popover></div>
+<div id="popout_character_notes"></div>
 <dialog id="dialog_confirm" class="dialog">
 	<h2 id="confirm_title">Confirm title</h2>
 	<div id="confirm_container">
@@ -202,6 +203,28 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	const dialog_character_sheet = new DialogCharacterSheet("#character_sheet");
 
 	const dialog_confirm = new DialogConfirm("#dialog_confirm");
+
+	const textarea_notes = document.createElement("textarea");
+	let textarea_notes_timeout = null;
+	textarea_notes.classList.add("character_notes_input");
+	textarea_notes.addEventListener("keydown", (event) => {
+		clearTimeout(textarea_notes_timeout);
+		textarea_notes_timeout = setTimeout(() => {
+			/** @var {Character} popout_character_notes.Target */
+			popout_character_notes.Target.Notes = event.target.value;
+			popout_character_notes.Target.PrimeUpload();
+		}, 2 * 1000);
+	});
+	const popout_character_notes = new PopoutElement("#popout_character_notes", {
+		elements: [
+			textarea_notes
+		],
+		callbacks: {
+			show: () => {
+				textarea_notes.value = popout_character_notes.Target.Notes;
+			}
+		}
+	});
 
 	const clock_real = document.querySelector("#clock_real");
 	// </editor-fold>
