@@ -16,7 +16,7 @@ class Notifications {
 			this.Container = document.querySelector(element_or_selector);
 		else
 			this.Container = element_or_selector;
-		this.Container.setAttribute("popover", "");
+		this.Container.setAttribute("popover", "manual");
 		this.MessageByID = {};
 	}
 

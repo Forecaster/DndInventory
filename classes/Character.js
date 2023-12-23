@@ -329,6 +329,7 @@ class Character extends Serializable {
 
 	PrimeUpload() {
 		console.debug("Primed character upload...");
+		notifications.RemoveMessageByID("saving_character");
 		notifications.Info(`Saving ${this.Name}...`, { id: "saving_character" });
 		clearTimeout(this.UploadTimer);
 		this.UploadTimer = setTimeout(() => {
