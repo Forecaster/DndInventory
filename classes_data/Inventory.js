@@ -52,6 +52,6 @@ class Inventory {
 			}
 		}
 		console.debug(container);
-		console.debug("Generated inventory HTML with " + (this.Width * this.Height) + " tiles.");
+		console.debug(`Generated inventory HTML with ${this.Width * this.Height} tiles.`);
 	}
 }

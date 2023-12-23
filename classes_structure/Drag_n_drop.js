@@ -26,7 +26,7 @@ class Drag_n_drop {
 				target[prop] = source[prop];
 			}
 		}
-		console.info("Cloned " + cloned.length + " event handlers.", cloned);
+		console.info(`Cloned ${cloned.length} event handlers.`, cloned);
 	}
 
 	#set_dragging_properties(element) {

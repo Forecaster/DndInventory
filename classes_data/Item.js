@@ -90,7 +90,7 @@ class Item {
 		div.style.height = (this.Shape.length * tile_height) + "px";
 		const thisItem = this;
 		div.onmouseover = function(event) {
-			tooltip.SetContent(thisItem.Name, ["<b>Weight:</b> " + thisItem.Weight, "", thisItem.Description]);
+			tooltip.SetContent(thisItem.Name, [`<b>Weight:</b> ${thisItem.Weight}`, "", thisItem.Description]);
 			tooltip.SetPosition(event.clientX, event.clientY);
 		}
 		div.onmousemove = function(event) {
@@ -136,7 +136,7 @@ class Item {
 			title.style.display = "none";
 			const icon = document.createElement("div");
 			icon.classList.add("item_icon");
-			icon.style.backgroundImage = "url('" + icons[this.Icon]['path'] + "')";
+			icon.style.backgroundImage = `url('${icons[this.Icon]['path']}')`;
 			icon.style.width = div.style.width;
 			icon.style.height = div.style.height;
 			div.appendChild(icon);

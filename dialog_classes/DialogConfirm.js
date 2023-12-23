@@ -24,7 +24,7 @@ class DialogConfirm extends Dialog {
 			row.appendChild(col);
 
 			let button = document.createElement("button");
-			button.className = "btn btn-" + option.color;
+			button.className = `btn btn-${option.color}`;
 			button.innerText = option.label;
 			button.onclick = (event) => {
 				this.Close();

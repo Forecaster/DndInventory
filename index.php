@@ -240,7 +240,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 		}
 		if (min.toString().length === 1)
 			min = "0" + min;
-		clock_real.innerText = hours + ":" + min + " " + am;
+		clock_real.innerText = `${hours}:${min} ${am}`;
 	}, 100);
 
 	// <editor-fold desc="Setup variables">

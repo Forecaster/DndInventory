@@ -10,7 +10,7 @@ class API {
 		const fail = options.fail ?? ((result, msg) => { console.error(result, msg) });
 		const error = options.error ?? ((payload) => { console.error(payload) });
 		const method = options.method ?? "post";
-		jQuery[method]("api/" + endpoint.toLowerCase() + ".php", data)
+		jQuery[method](`api/${endpoint.toLowerCase()}.php`, data)
 			.done((payload) => {
 				payload = JSON.parse(payload);
 				if (payload.result === 0 && success !== null)

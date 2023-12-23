@@ -104,7 +104,7 @@ class Field extends Serializable {
 				input.addEventListener("keyup", options.callbacks.onkeyup);
 		}
 		if (this.Size)
-			input.style.width = "calc(" + this.Size + "ch + 8px)";
+			input.style.width = `calc(${this.Size}ch + 8px)`;
 		if (this.Rollable)
 			input.classList.add("rollable");
 		if (typeof this.Value !== "undefined" && this.Value !== null)

@@ -153,7 +153,7 @@ class Character extends Serializable {
 			});
 		}
 		if (!return_value)
-			console.warn("Failed to find field '" + label + "' to update in current character.", this);
+			console.warn(`Failed to find field '${label}' to update in current character.`, this);
 		return return_value;
 	}
 
@@ -194,7 +194,7 @@ class Character extends Serializable {
 		if (update_target == null) {
 			update_target = document.createElement("div");
 			update_target.classList.add("character_compact");
-			update_target.id = "character_" + this.Name.toLowerCase();
+			update_target.id = `character_${this.Name.toLowerCase()}`;
 			update_target.addEventListener("keydown", callback_keydown);
 
 			let control_container = document.createElement("div");
@@ -224,7 +224,7 @@ class Character extends Serializable {
 				update_target.parentElement.removeChild(update_target);
 			}
 			del.onclick = () => {
-				dialog_confirm.Open("Really delete <span style='color: red;'>" + this.Name + "</span>?", [{ label: "Yes", color: "danger", callback: delete_me }, { label: "No", color: "success" }])
+				dialog_confirm.Open(`Really delete <span style='color: red;'>${this.Name}</span>?`, [{ label: "Yes", color: "danger", callback: delete_me }, { label: "No", color: "success" }])
 			}
 			control_container.appendChild(del);
 
@@ -322,7 +322,7 @@ class Character extends Serializable {
 		}
 
 		let owner = document.createElement("div");
-		owner.innerText = "This character belongs to " + (this.Owner ?? "GM");
+		owner.innerText = `This character belongs to ${this.Owner ?? 'the GM'}`;
 		update_target.appendChild(owner);
 
 		return update_target;

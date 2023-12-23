@@ -16,7 +16,7 @@ class Tooltip {
 	}
 
 	SetContent(title, lines) {
-		this.Element.innerHTML = "<title>" + title + "</title><tt_body>" + lines.join("<br/>") + "</tt_body>";
+		this.Element.innerHTML = `<title>${title}</title><tt_body>${lines.join("<br/>")}</tt_body>`;
 	}
 
 	Hide() {

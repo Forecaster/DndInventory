@@ -10,7 +10,7 @@ class DialogSessionCreateJoin extends Dialog {
 			},
 			fail_callback: (result, msg, silent) => {
 				if (!silent)
-					notifications.Error("Failed to resume previous session! Error: " + msg);
+					notifications.Error(`Failed to resume previous session! Error: ${msg}`);
 				console.error(result, msg);
 				super.Open();
 			}
