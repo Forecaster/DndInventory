@@ -26,7 +26,6 @@ class Field extends Serializable {
 	 */
 	constructor(label, options = {}) {
 		super();
-		console.debug(options);
 		this.Label = label;
 		this.LabelShort = options.label_short ?? null;
 		this.Key = options.key ?? null;
@@ -39,7 +38,7 @@ class Field extends Serializable {
 	}
 
 	/**
-	 * @param {{ short_label:boolean, force_short_label:boolean }} options
+	 * @param {{ short_label:boolean, force_short_label:boolean, callbacks:{ onclick:function, onblur:function, onfocus:function, onkeydown:function, onkeyup:function } }} options
 	 * @return {HTMLDivElement}
 	 */
 	GetField(options = {}) {
@@ -93,14 +92,16 @@ class Field extends Serializable {
 		input.title = this.Label;
 		input.classList.add("field");
 		if (options.hasOwnProperty("callbacks")) {
+			if (options.callbacks.hasOwnProperty("onclick"))
+				input.addEventListener("click", options.callbacks.onclick);
 			if (options.callbacks.hasOwnProperty("onblur"))
-				input.onblur = options.callbacks.onblur;
+				input.addEventListener("blur", options.callbacks.onblur);
 			if (options.callbacks.hasOwnProperty("onfocus"))
-				input.onfocus = options.callbacks.onfocus;
+				input.addEventListener("focus", options.callbacks.onfocus);
 			if (options.callbacks.hasOwnProperty("onkeydown"))
-				input.onkeydown = options.callbacks.onkeydown;
+				input.addEventListener("keydown", options.callbacks.onkeydown);
 			if (options.callbacks.hasOwnProperty("onkeyup"))
-				input.onkeyup = options.callbacks.onkeyup;
+				input.addEventListener("keyup", options.callbacks.onkeyup);
 		}
 		if (this.Size)
 			input.style.width = "calc(" + this.Size + "ch + 8px)";

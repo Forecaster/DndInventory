@@ -2,11 +2,11 @@
  * @property {{ name:string, characters:Character[], active:boolean }[]} Players
  */
 class Session {
-	/** @var {string} */
+	/** @var {string|null} */
 	ID
-	/** @var {string} */
+	/** @var {string|null} */
 	Name
-	/** @var {Ruleset} */
+	/** @var {Ruleset|null} */
 	Ruleset
 	/** @var {int} */
 	EncumbranceOption
@@ -14,6 +14,7 @@ class Session {
 	Players
 
 	CurrentUsername = null;
+	/** @var {string|null} */
 	Token
 
 	/** @var {number} */
@@ -64,32 +65,58 @@ class Session {
 		}, 5000);
 	}
 
+	StorePreviousSession(token = null, id = null, player = null) {
+		if (token !== null)
+			this.Token = token;
+		localStorage.setItem("session_token", this.Token);
+		if (id !== null)
+			this.ID = id;
+		localStorage.setItem("session_id", this.ID);
+		if (player !== null)
+			this.CurrentUsername = player;
+		if (this.CurrentUsername !== null)
+			localStorage.setItem("session_player", this.CurrentUsername);
+		else
+			localStorage.removeItem("session_player");
+	}
+
+	static RetrievePreviousSession() {
+		const session = new Session("");
+		session.Token = localStorage.getItem("session_token");
+		session.ID = localStorage.getItem("session_id");
+		session.CurrentUsername = localStorage.getItem("session_player");
+		return session;
+	}
+
 	/**
-	 * @param {{ session_pwd:string, gm_pwd:string, success_callback:function, fail_callback:function }} options Fail callback receives an error message as the first parameter.
+	 * @param {{ session_pwd:string, gm_pwd:string, success_callback:function(payload:object), fail_callback:function(result:number, msg:string) }} options Fail callback receives an error message as the first parameter.
 	 */
-	RegisterSession(options) {
+	RegisterSession(options= {}) {
 		if (typeof options.success_callback !== "function")
-			options.success_callback = () => {};
+			options.success_callback = (payload) => { console.info(payload) };
 		if (typeof options.fail_callback !== "function")
-			options.fail_callback = () => {};
+			options.fail_callback = (result, msg) => { console.error(result, msg) };
 		if (typeof this.ID !== "string" || this.ID.length !== 14) {
-			options.fail_callback("Invalid session id");
+			options.fail_callback(-1, "Invalid or no session id set.");
 			return;
 		}
-		if (typeof options.gm_pwd !== "string" || options.gm_pwd.length <= 0) {
-			options.fail_callback("Invalid or blank GM password");
+		if (typeof options.gm_pwd !== "string" || options.gm_pwd.length <= 2) {
+			options.fail_callback(-2, "Invalid or blank GM password");
 			return;
 		}
-		if (typeof options.session_pwd !== "string" || options.session_pwd.length <= 0) {
-			options.fail_callback("Invalid or blank session password");
+		if (typeof options.session_pwd !== "string" || options.session_pwd.length <= 2) {
+			options.fail_callback(-3, "Invalid or blank session password");
 			return;
 		}
 		console.debug("SessionCreate", options);
 		const data = { session_id: this.ID, name: this.Name, gm_pwd: options.gm_pwd, pwd: options.session_pwd, ruleset: this.Ruleset };
-		API.Call("session_create", data, {
+		API.Call("session_create", {
 			data: data,
-			success: () => {
-				options.success_callback();
+			/** @var {{ data:{ token:string, session_data:{ id:string, name:string, ruleset:string }}}} payload */
+			success: (payload) => {
+				this.Mode = "load";
+				this.StorePreviousSession(payload.data.token);
+				options.success_callback(payload);
 			},
 			fail: (result, msg) => {
 				options.fail_callback(result, msg);
@@ -98,24 +125,23 @@ class Session {
 	}
 
 	/**
-	 * @param {{ pwd:string, gm_pwd:string, success_callback:function, fail_callback:function }} options
+	 * @param {{ pwd:string, gm_pwd:string, success_callback:function(payload:object), fail_callback:function(result:number, msg:string) }} options
 	 */
-	LoadSession(options) {
+	LoadSession(options= {}) {
 		if (typeof options.success_callback !== "function")
-			options.success_callback = () => {};
+			options.success_callback = (payload) => { console.info(payload) };
 		if (typeof options.fail_callback !== "function")
-			options.fail_callback = () => {};
+			options.fail_callback = (result, msg) => { console.error(result, msg) };
 		console.debug("LoadSession", options);
 		const data = { session_id: this.ID, gm_pwd: options.gm_pwd || null, pwd: options.pwd || null };
 		API.Call("session_load",{
 			data: data,
-			/** @var {{ data:{ token:string, session_data:{ name:string, ruleset:string }}}} payload */
+			/** @var {{ data:{ token:string, session_data:{ id:string, name:string, ruleset:string }}}} payload */
 			success: (payload) => {
-				this.Token = payload.data.token;
+				this.StorePreviousSession(payload.data.token);
 				this.Name = payload.data.session_data.name;
 				this.Ruleset = Ruleset[payload.data.session_data.ruleset];
 				options.success_callback();
-				localStorage.setItem("session_token", this.Token);
 			},
 			fail: (result, msg) => {
 				options.fail_callback(result, msg);
@@ -125,25 +151,63 @@ class Session {
 
 	/**
 	 *
-	 * @param {{ pwd:string, success_callback:function, fail_callback:function }} options
+	 * @param {{ pwd:string, success_callback:function(payload:object), fail_callback:function(result:number, msg:string) }} options
 	 */
-	JoinSession(options) {
+	JoinSession(options= {}) {
 		if (typeof options.success_callback !== "function")
-			options.success_callback = () => {};
+			options.success_callback = (payload) => { console.info(payload) };
 		if (typeof options.fail_callback !== "function")
-			options.fail_callback = () => {};
+			options.fail_callback = (result, msg) => { console.error(result, msg) };
 		console.debug("JoinSession", options);
 		const data = { session_id: this.ID, username: this.CurrentUsername, pwd: options.pwd || null };
 		API.Call("session_join", {
 			data: data,
-			success: () => {
-				this.Token = payload.data.token;
-				options.success_callback();
+			/** @var {{ data:{ token:string, session_data:{ id:string, name:string, ruleset:string }}}} payload */
+			success: (payload) => {
+				this.StorePreviousSession(payload.data.token);
+				options.success_callback(payload);
 			},
 			fail: (result, msg) => {
-				options.fail_callback(msg);
+				options.fail_callback(result, msg);
 			}
 		});
+	}
+
+	/**
+	 * @param {{ silent_fail:boolean, success_callback:function(payload:object), fail_callback:function(result:number, msg:string, silent:boolean) }} options
+	 * The `silent_fail` parameter forces method to only produce error callbacks when failing in the api call. Missing values in the session instance
+	 * will silently fail. Fail callback will still be called, but will have the parameter `silent` set to true.
+	 */
+	ResumeSession(options = {}) {
+		const silent = options.silent_fail ?? false;
+		if (typeof options.success_callback !== "function")
+			options.success_callback = (payload) => { console.info(payload) };
+		if (typeof options.fail_callback !== "function")
+			options.fail_callback = (result, msg) => { console.error(result, msg) };
+		if (typeof this.ID !== "string" || this.ID.length !== 14) {
+			options.fail_callback(-1, "Invalid or no session id set.", silent);
+			return;
+		}
+		if (typeof this.Token === "undefined" || this.Token === null || this.Token.length === 0) {
+			options.fail_callback(-2, "Invalid or no token set.", silent);
+			return;
+		}
+		const data = { session_id: this.ID, token: this.Token, player: this.CurrentUsername };
+		API.Call("session_resume", {
+			data: data,
+			/** @var {{ data:{ token:string, session_data:{ id:string, name:string, ruleset:string }}}} payload */
+			success: (payload) => {
+				this.Name = payload.data.session_data.name;
+				this.Ruleset = payload.data.session_data.ruleset;
+				options.success_callback(payload);
+			},
+			fail: (result, msg) => {
+				options.fail_callback(result, msg, silent);
+			},
+			error: (payload) => {
+				options.fail_callback(-3, `${payload.status} ${payload.statusText}`, silent);
+			}
+		})
 	}
 
 	SyncCharacters() {

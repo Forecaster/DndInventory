@@ -6,7 +6,6 @@ class FieldNumber extends Field {
 	Max
 
 	constructor(label, options = {}) {
-		console.debug(options);
 		super(label, options);
 		this.Value = options.value || 0;
 		this.Min = typeof options.min !== "undefined" ? options.min : null;
@@ -41,11 +40,11 @@ class FieldNumber extends Field {
 		}
 		inputs.forEach((input) => {
 			if (input.getAttribute("field-type") === this.constructor.name && input.onclick == null) {
-				input.onclick = (event) => {
+				input.addEventListener("click", (event) => {
 					event.target.select();
-				}
+				});
 
-				input.onkeydown = (event) => {
+				input.addEventListener("keydown", (event) => {
 					let action = false;
 					let t = event.target;
 					if (event.key === "Backspace")
@@ -107,7 +106,7 @@ class FieldNumber extends Field {
 						t.value = this.Min;
 					if (this.Max !== null && t.value > this.Max)
 						t.value = this.Max;
-				};
+				});
 			}
 		})
 		return inputs;

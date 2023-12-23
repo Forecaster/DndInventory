@@ -128,18 +128,31 @@ class Character extends Serializable {
 		return [col1, col2];
 	}
 
+	static #SetField(field, label, value) {
+		if (field.Label === label) {
+			field.Value = value;
+			return true;
+		} else if (field.SubField !== null) {
+			return this.#SetField(field.SubField, label, value);
+		}
+		return false;
+	}
+
 	SetField(label, value) {
+		let return_value = false;
 		if (Array.isArray(this.Fields)) {
 			this.Fields.forEach((group) => {
 				group.Fields.forEach((field) => {
-					if (field.Label === label) {
-						field.Value = value;
+					if (Character.#SetField(field, label, value)) {
 						this.PrimeUpload();
-						return null;
+						return_value = true;
 					}
 				});
 			});
 		}
+		if (!return_value)
+			console.warn("Failed to find field '" + label + "' to update in current character.", this);
+		return return_value;
 	}
 
 	GetField(label, default_value = null) {
@@ -155,6 +168,18 @@ class Character extends Serializable {
 	}
 
 	GetCompactElement(update_target = null) {
+		let field_update_timer = null;
+		const callback_keydown = (event) => {
+			console.debug("callback_keydown", event);
+			clearTimeout(field_update_timer);
+			field_update_timer = setTimeout(() => {
+				let field = event.target.getAttribute("field-label");
+				console.debug("field", field);
+				if (typeof field !== "undefined" && field !== null)
+					this.SetField(field, event.target.value.trim());
+			}, 500);
+		};
+
 		let name;
 		let info;
 		let status;
@@ -163,16 +188,7 @@ class Character extends Serializable {
 			update_target = document.createElement("div");
 			update_target.classList.add("character_compact");
 			update_target.id = "character_" + this.Name.toLowerCase();
-			let field_update_timer = null;
-			update_target.onkeydown = (event) => {
-				console.debug(event);
-				clearTimeout(field_update_timer);
-				field_update_timer = setTimeout(() => {
-					let field = event.target.getAttribute("field-label");
-					if (typeof field !== "undefined" && field !== null)
-						this.SetField(field, event.target.value.trim());
-				}, 500);
-			};
+			update_target.addEventListener("keydown", callback_keydown);
 
 			let control_container = document.createElement("div");
 			control_container.classList.add("control_container");
@@ -313,8 +329,10 @@ class Character extends Serializable {
 
 	PrimeUpload() {
 		console.debug("Primed character upload...");
+		notifications.Info(`Saving ${this.Name}...`, { id: "saving_character" });
 		clearTimeout(this.UploadTimer);
 		this.UploadTimer = setTimeout(() => {
+			notifications.RemoveMessageByID("saving_character");
 			this.Upload();
 		}, 5 * 1000);
 	}
