@@ -169,15 +169,19 @@ class Character extends Serializable {
 
 	GetCompactElement(update_target = null) {
 		let field_update_timer = null;
+		let field_update_function = null;
+		let field_update_field = null;
 		const callback_keydown = (event) => {
-			console.debug("callback_keydown", event);
 			clearTimeout(field_update_timer);
-			field_update_timer = setTimeout(() => {
-				let field = event.target.getAttribute("field-label");
-				console.debug("field", field);
+			const field = event.target.getAttribute("field-label");
+			if (field_update_function !== null && field_update_field !== field)
+				field_update_function();
+			field_update_field = field;
+			field_update_function = () => {
 				if (typeof field !== "undefined" && field !== null)
 					this.SetField(field, event.target.value.trim());
-			}, 500);
+			};
+			field_update_timer = setTimeout(field_update_function, 500);
 		};
 
 		let name;
@@ -328,7 +332,6 @@ class Character extends Serializable {
 	}
 
 	PrimeUpload() {
-		console.debug("Primed character upload...");
 		notifications.RemoveMessageByID("saving_character");
 		notifications.Info(`Saving ${this.Name}...`, { id: "saving_character" });
 		clearTimeout(this.UploadTimer);
