@@ -5,8 +5,6 @@ class Character extends Serializable {
 	Name
 	/** @var {string} */
 	Owner
-	/** @deprecated */
-	Fields
 	/** @var {FieldGroup[]} */
 	FieldGroups
 	/** @var {FieldGroup[]} */
