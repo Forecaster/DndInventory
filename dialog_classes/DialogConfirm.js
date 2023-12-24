@@ -5,9 +5,9 @@ class DialogConfirm extends Dialog {
 
 	/**
 	 * @param {string} title
-	 * @param {{ label:string, color:string, callback:function }[]}options
+	 * @param {{ label:string, color:string, callback:function }[]} [options]
 	 */
-	Open(title, options = null) {
+	Open(title, options = []) {
 		const title_element = this.DialogElement.querySelector("#confirm_title");
 		title_element.innerHTML = title;
 		this.Options = options;

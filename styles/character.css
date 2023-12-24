@@ -130,6 +130,11 @@
 	input:focus-visible {
 		outline: none;
 	}
+
+	input[readonly] {
+		cursor: not-allowed;
+		border: none;
+	}
 }
 
 .character_notes_input {

@@ -24,7 +24,7 @@ class DialogAction extends Dialog {
 	}
 
 	/**
-	 * @param {{ label:string, icon:string, key:string, fields:string[], action:function(character:Character, fields:object) }} action
+	 * @param {{ label:string, [icon]:string, key:string, fields:string[], action:function(character:Character, fields:object) }} action
 	 */
 	Open(action) {
 		this.CurrentAction = action;

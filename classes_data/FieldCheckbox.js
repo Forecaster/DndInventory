@@ -3,6 +3,10 @@ class FieldCheckbox extends Field {
 		return this.Value === true;
 	}
 
+	/**
+	 * @param {{ [ignore_sub_field]:boolean, callbacks:{ [onblur]:function, [onfocus]:function, [onkeydown]:function, [onkeyup]:function } }} options
+	 * @returns {HTMLInputElement[]}
+	 */
 	GetInput(options = {}) {
 		let inputs = super.GetInput(options);
 		inputs.forEach((input) => {

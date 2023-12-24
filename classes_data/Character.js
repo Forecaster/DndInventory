@@ -5,8 +5,10 @@ class Character extends Serializable {
 	Name
 	/** @var {string} */
 	Owner
-	/** @var {FieldGroup[]} */
+	/** @deprecated */
 	Fields
+	/** @var {FieldGroup[]} */
+	FieldGroups
 	/** @var {FieldGroup[]} */
 	FieldsCustom
 	/** @var {{ name:string, fields:string[] }[]} PinGroups
@@ -28,21 +30,21 @@ class Character extends Serializable {
 
 	/**
 	 * @param {string} name
-	 * @param {{ id:string, owner:string, fields:FieldGroup[], pin_groups:{} }} options
+	 * @param {{ [id]:string|null, [owner]:string|null, [fields]:FieldGroup[], [pin_groups]:{ name:string, fields:string[] }[] }} [options]
 	 */
 	constructor(name, options = {}) {
 		super();
 		this.Name = name;
-		this.ID = options.id || null;
-		this.Owner = options.owner || null;
-		this.Fields = options.fields || active_ruleset.CharacterFields;
+		this.ID = options.id ?? null;
+		this.Owner = options.owner ?? null;
+		this.FieldGroups = options.fields ?? active_ruleset.CharacterFields;
 		let inv_size = active_ruleset.InventorySize(session, this);
 		this.CharacterInventory = new Inventory("Backpack", { sectors: inv_size });
-		this.PinGroups = options.pin_groups || [];
+		this.PinGroups = options.pin_groups ?? [];
 		this.LastSync = new Date();
 
 		this.KeyFields = {};
-		this.Fields.forEach((group) => {
+		this.FieldGroups.forEach((group) => {
 			group.Fields.forEach((field) => {
 				let items = Character.#GetKeyAndField(field);
 				for (let key in items) {
@@ -148,8 +150,8 @@ class Character extends Serializable {
 
 	SetField(label, value) {
 		let return_value = false;
-		if (Array.isArray(this.Fields)) {
-			this.Fields.forEach((group) => {
+		if (Array.isArray(this.FieldGroups)) {
+			this.FieldGroups.forEach((group) => {
 				group.Fields.forEach((field) => {
 					if (Character.#SetField(field, label, value)) {
 						this.PrimeUpload();
@@ -165,8 +167,8 @@ class Character extends Serializable {
 
 	GetField(label, default_value = null) {
 		let value = default_value;
-		if (Array.isArray(this.Fields)) {
-			this.Fields.forEach((group) => {
+		if (Array.isArray(this.FieldGroups)) {
+			this.FieldGroups.forEach((group) => {
 				group.Fields.forEach((field) => {
 					if (field.Label === label)
 						value = field.Value;
@@ -264,7 +266,7 @@ class Character extends Serializable {
 		/** @var {FieldGroup[]} */
 		let custom_groups = [];
 
-		this.Fields.forEach((group) => {
+		this.FieldGroups.forEach((group) => {
 			group.Fields.forEach((field) => {
 				const group = this.GetFieldPinGroup(field);
 				if (group !== null) {

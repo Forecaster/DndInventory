@@ -22,7 +22,7 @@ class Notifications {
 
 	/**
 	 * @param {string} msg
-	 * @param {{ duration:number, type:"info"|"success"|"warning"|"error", id:string }} options
+	 * @param {{ [duration]:number, [type]:"info"|"success"|"warning"|"error", [id]:string }} [options]
 	 * `id` may be a custom id assigned to the message. This id can be used with `RemoveMessageByID` to clear the message before the timer expires.
 	 * @constructor
 	 */

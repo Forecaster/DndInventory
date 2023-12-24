@@ -8,7 +8,7 @@ class PopoutElement {
 
 	/**
 	 * @param {HTMLElement|string} element_or_selector
-	 * @param {{ text:string, html:string, elements:HTMLElement[], callbacks:{ show:function } }} options
+	 * @param {{ [text]:string, [html]:string, [elements]:HTMLElement[], [callbacks]:{ [show]:function } }} [options]
 	 */
 	constructor(element_or_selector, options = {}) {
 		if (typeof element_or_selector === "string")
@@ -30,7 +30,7 @@ class PopoutElement {
 	}
 
 	/**
-	 * @param {{ text:string, html:string, elements:HTMLElement[] }} options
+	 * @param {{ [text]:string, [html]:string, [elements]:HTMLElement[] }} options
 	 */
 	SetContent(options = {}) {
 		if (typeof options.html !== "undefined" && options.html !== null)
@@ -46,7 +46,7 @@ class PopoutElement {
 	}
 
 	/**
-	 * @param {{ event:MouseEvent, position:{ x:number, y:number }}} options
+	 * @param {{ [event]:MouseEvent, [position]:{ x:number, y:number }}} [options]
 	 */
 	SetPosition(options = {}) {
 		let x = 0;
@@ -61,7 +61,7 @@ class PopoutElement {
 	}
 
 	/**
-	 * @param {{ event:MouseEvent, position:{ x:number, y:number }, text:string, html:string, elements:HTMLElement[], target:Any }} options
+	 * @param {{ [event]:MouseEvent, [position]:{ x:number, y:number }, [text]:string, [html]:string, [elements]:HTMLElement[], [target]:* }} [options]
 	 */
 	Show(options = {}) {
 		this.SetPosition(options);

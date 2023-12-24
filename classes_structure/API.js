@@ -2,7 +2,7 @@
 class API {
 	/**
 	 * @param {string} endpoint An api endpoint such as `session_join`.
-	 * @param {{ data:object, success:function(object), fail:function(result:number, msg:string), error:function(object), method:"get"|"post" }} options `fail` is called when an api error occurs (`result` in response is not zero). `error` is called when a request error occurs.
+	 * @param {{ [data]:{}, [success]:function(object), [fail]:function(result:number, msg:string), [error]:function(object), [method]:"get"|"post" }} [options] `fail` is called when an api error occurs (`result` in response is not zero). `error` is called when a request error occurs.
 	 */
 	static Call(endpoint, options = {}) {
 		const data = options.data ?? null;
@@ -10,6 +10,7 @@ class API {
 		const fail = options.fail ?? ((result, msg) => { console.error(result, msg) });
 		const error = options.error ?? ((payload) => { console.error(payload) });
 		const method = options.method ?? "post";
+		// noinspection JSUnresolvedReference
 		jQuery[method](`api/${endpoint.toLowerCase()}.php`, data)
 			.done((payload) => {
 				payload = JSON.parse(payload);
@@ -22,6 +23,5 @@ class API {
 				if (error !== null)
 					error(payload);
 			})
-
 	}
 }

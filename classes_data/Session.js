@@ -1,6 +1,4 @@
-/**
- * @property {{ name:string, characters:Character[], active:boolean }[]} Players
- */
+
 class Session {
 	/** @var {string|null} */
 	ID
@@ -33,7 +31,7 @@ class Session {
 
 	/**
 	 * @param {string} id
-	 * @param {{ name: string, ruleset:string, encumbrance_option:int }} options
+	 * @param {{ [name]: string, [ruleset]:string, [encumbrance_option]:int }} [options]
 	 */
 	constructor(id, options = {}) {
 		this.ID = id;
@@ -49,7 +47,7 @@ class Session {
 	}
 
 	/**
-	 * @param {{ id:string, name:string, ruleset:string, encumbrance_option:int }} object
+	 * @param {{ [id]:string, [name]:string, [ruleset]:string, [encumbrance_option]:int }} object
 	 * @returns {this}
 	 */
 	static fromJson(object) {
@@ -89,7 +87,7 @@ class Session {
 	}
 
 	/**
-	 * @param {{ session_pwd:string, gm_pwd:string, success_callback:function(payload:object), fail_callback:function(result:number, msg:string) }} options Fail callback receives an error message as the first parameter.
+	 * @param {{ [session_pwd]:string, [gm_pwd]:string, [success_callback]:function(payload:object), [fail_callback]:function(result:number, msg:string) }} [options] Fail callback receives an error message as the first parameter.
 	 */
 	RegisterSession(options= {}) {
 		if (typeof options.success_callback !== "function")
@@ -112,7 +110,6 @@ class Session {
 		const data = { session_id: this.ID, name: this.Name, gm_pwd: options.gm_pwd, pwd: options.session_pwd, ruleset: this.Ruleset };
 		API.Call("session_create", {
 			data: data,
-			/** @var {{ data:{ token:string, session_data:{ id:string, name:string, ruleset:string }}}} payload */
 			success: (payload) => {
 				this.Mode = "load";
 				this.StorePreviousSession(payload.data.token);
@@ -126,7 +123,7 @@ class Session {
 	}
 
 	/**
-	 * @param {{ pwd:string, gm_pwd:string, success_callback:function(payload:object), fail_callback:function(result:number, msg:string) }} options
+	 * @param {{ [pwd]:string, [gm_pwd]:string, [success_callback]:function(payload:object), [fail_callback]:function(result:number, msg:string) }} [options]
 	 */
 	LoadSession(options= {}) {
 		if (typeof options.success_callback !== "function")
@@ -137,7 +134,6 @@ class Session {
 		const data = { session_id: this.ID, gm_pwd: options.gm_pwd || null, pwd: options.pwd || null };
 		API.Call("session_load",{
 			data: data,
-			/** @var {{ data:{ token:string, session_data:{ id:string, name:string, ruleset:string }}}} payload */
 			success: (payload) => {
 				this.StorePreviousSession(payload.data.token);
 				this.Name = payload.data.session_data.name;
@@ -153,7 +149,7 @@ class Session {
 
 	/**
 	 *
-	 * @param {{ pwd:string, success_callback:function(payload:object), fail_callback:function(result:number, msg:string) }} options
+	 * @param {{ [pwd]:string, [success_callback]:function(payload:object), [fail_callback]:function(result:number, msg:string) }} [options]
 	 */
 	JoinSession(options= {}) {
 		if (typeof options.success_callback !== "function")
@@ -164,7 +160,6 @@ class Session {
 		const data = { session_id: this.ID, username: this.CurrentUsername, pwd: options.pwd || null };
 		API.Call("session_join", {
 			data: data,
-			/** @var {{ data:{ token:string, session_data:{ id:string, name:string, ruleset:string }}}} payload */
 			success: (payload) => {
 				this.StorePreviousSession(payload.data.token);
 				options.success_callback(payload);
@@ -177,7 +172,7 @@ class Session {
 	}
 
 	/**
-	 * @param {{ silent_fail:boolean, success_callback:function(payload:object), fail_callback:function(result:number, msg:string, silent:boolean) }} options
+	 * @param {{ [silent_fail]:boolean, [success_callback]:function(payload:object), [fail_callback]:function(result:number, msg:string, silent:boolean) }} [options]
 	 * The `silent_fail` parameter forces method to only produce error callbacks when failing in the api call. Missing values in the session instance
 	 * will silently fail. Fail callback will still be called, but will have the parameter `silent` set to true.
 	 */
@@ -198,7 +193,6 @@ class Session {
 		const data = { session_id: this.ID, token: this.Token, player: this.CurrentUsername };
 		API.Call("session_resume", {
 			data: data,
-			/** @var {{ data:{ token:string, session_data:{ id:string, name:string, ruleset:string }}}} payload */
 			success: (payload) => {
 				this.Name = payload.data.session_data.name;
 				this.Ruleset = payload.data.session_data.ruleset;

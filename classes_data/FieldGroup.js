@@ -4,6 +4,7 @@ class FieldGroup extends Serializable {
 	Label
 	/** @var {Field[]} */
 	Fields
+	ParentObjects = [];
 
 	/**
 	 * Any number of fields can be supplied as parameters after `label` which will be added to the group.
@@ -23,6 +24,7 @@ class FieldGroup extends Serializable {
 	 * @param {Field} field
 	 */
 	AddField(field) {
+		field.AddParentGroup(this);
 		this.Fields.push(field);
 	}
 

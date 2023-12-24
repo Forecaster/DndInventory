@@ -19,7 +19,7 @@ class Dialog {
 
 	/**
 	 * @param {HTMLElement|string} selector_or_element
-	 * @param {{ external_buttons: { open:(HTMLElement|string)[], close:(HTMLElement|string)[], save:(HTMLElement|string)[], save_close:(HTMLElement|string)[] }, enter_submits:boolean }} options
+	 * @param {{ [external_buttons]: { [open]:(HTMLElement|string)[], [close]:(HTMLElement|string)[], [save]:(HTMLElement|string)[], [save_close]:(HTMLElement|string)[] }, [enter_submits]:boolean }} [options]
 	 */
 	constructor(selector_or_element, options = {}) {
 		if (typeof selector_or_element === "string")
@@ -31,7 +31,7 @@ class Dialog {
 			return null;
 		}
 
-		let external_buttons = options.external_buttons || {};
+		let external_buttons = options.external_buttons ?? {};
 
 		let buttons_open = [];
 		let buttons_close = [];
@@ -141,7 +141,7 @@ class Dialog {
 
 	/**
 	 * @param {HTMLInputElement[]} inputs
-	 * @param {{ test_function:function, all_succeed:boolean }} options
+	 * @param {{ [test_function]:function, [all_succeed]:boolean }} options
 	 */
 	CheckInputs(inputs, options = {}) {
 		let all_succeed = options.all_succeed ?? true;

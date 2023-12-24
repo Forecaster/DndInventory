@@ -17,14 +17,14 @@ class Inventory {
 
 	/**
 	 * @param {string} name
-	 * @param { {sectors: { width:int, height:int, color:string }[], sector_direction:string} } options
+	 * @param {{ [sectors]:{ width:int, height:int, color:string }[], [sector_direction]:string }} options
 	 */
 	constructor(name, options) {
 		this.Name = name;
 		this.Ruleset = null;
 		this.Contents = [];
-		this.Sectors = options.sectors || [];
-		this.SectorDirection = options.sector_direction || "horizontal";
+		this.Sectors = options.sectors ?? [];
+		this.SectorDirection = options.sector_direction ?? "horizontal";
 	}
 
 	PopulateContainer(container) {

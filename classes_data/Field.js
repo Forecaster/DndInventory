@@ -17,12 +17,16 @@ class Field extends Serializable {
 	Value
 	/** @var {string} */
 	Formula
+	/** @var {string} */
+	CustomFormula
 	/** @var {string[]} */
 	FormulaKeys
+	/** @var {FieldGroup[]} */
+	ParentGroups = [];
 
 	/**
 	 * @param {string} label
-	 * @param {{ label_short:string, key:string, value:any, rollable:string, size:int, sub_field:Field, sub_field_divider:string, formula:string }} options
+	 * @param {{ [label_short]:string, [key]:string, [value]:any, [rollable]:string, [size]:int, [sub_field]:Field, [sub_field_divider]:string, [formula]:string }} [options]
 	 */
 	constructor(label, options = {}) {
 		super();
@@ -37,8 +41,13 @@ class Field extends Serializable {
 		this.Formula = options.formula ?? null;
 	}
 
+	AddParentGroup(group) {
+		if (this.ParentGroups.indexOf(group) === -1)
+			this.ParentGroups.push(group);
+	}
+
 	/**
-	 * @param {{ short_label:boolean, force_short_label:boolean, callbacks:{ onclick:function, onblur:function, onfocus:function, onkeydown:function, onkeyup:function } }} options
+	 * @param {{ [short_label]:boolean, [force_short_label]:boolean, [callbacks]:{ [onclick]:function, [onblur]:function, [onfocus]:function, [onkeydown]:function, [onkeyup]:function } }} [options]
 	 * @return {HTMLDivElement}
 	 */
 	GetField(options = {}) {
@@ -79,7 +88,7 @@ class Field extends Serializable {
 	}
 
 	/**
-	 * @param {{ ignore_sub_field:boolean, callbacks:{ onblur:function, onfocus:function, onkeydown:function, onkeyup:function } }} options
+	 * @param {{ [ignore_sub_field]:boolean, callbacks:{ [onblur]:function, [onfocus]:function, [onkeydown]:function, [onkeyup]:function } }} options
 	 * @returns {HTMLInputElement[]}
 	 */
 	GetInput(options = {}) {
@@ -109,6 +118,10 @@ class Field extends Serializable {
 			input.classList.add("rollable");
 		if (typeof this.Value !== "undefined" && this.Value !== null)
 			input.value = this.Value.toString();
+		if (this.Formula !== null && this.Formula.length > 0) {
+			input.setAttribute("readonly", "true");
+			this.ParseFormula();
+		}
 		inputs.push(input);
 		if (this.SubField !== null && !options.ignore_sub_field)
 			inputs = inputs.concat(this.SubField.GetInput(options));
@@ -117,7 +130,7 @@ class Field extends Serializable {
 
 	/**
 	 * @param {HTMLElement} container
-	 * @param {{ callbacks:{ onblur:function, onfocus:function, onkeydown:function, onkeyup:function } }} options
+	 * @param {{ [callbacks]:{ [onblur]:function, [onfocus]:function, [onkeydown]:function, [onkeyup]:function } }} options
 	 * @constructor
 	 */
 	AppendInput(container, options = {}) {
@@ -155,16 +168,27 @@ class Field extends Serializable {
 	}
 
 	Refresh() {
-		const elements = Array.from(document.querySelectorAll(`[field-label='${this.Label}']`));
+		const label = this.Label.replace("'", "\\\'")
+		const elements = Array.from(document.querySelectorAll(`[field-label='${label}']`));
 		elements.forEach((element) => {
 			element.value = this.Value;
 		})
 	}
 
-	ParseFormula() {
-		const pattern_groups = /.*\(.*?\).*/;
-		if (this.Formula !== null) {
+	static FindValueOfKey(key) {
+		return null;
+	}
 
+	ParseFormula() {
+		const pattern_keys = /{([a-z_.]*)}/g;
+		const pattern_groups = /.*\(.*?\).*/g;
+		let formula = this.CustomFormula ?? this.Formula ?? null;
+		if (formula !== null) {
+			let keys = Array.from(formula.matchAll(pattern_keys));
+			keys.forEach((match) => {
+				const key_value = Field.FindValueOfKey(match[1]);
+				console.debug("value", key_value);
+			})
 		}
 	}
 }

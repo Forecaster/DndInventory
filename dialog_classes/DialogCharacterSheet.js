@@ -21,7 +21,7 @@ class DialogCharacterSheet extends Dialog {
 
 		this.FieldContainer.innerHTML = "";
 
-		character.Fields.forEach((group) => {
+		character.FieldGroups.forEach((group) => {
 			let table = document.createElement("table");
 			this.FieldContainer.appendChild(table);
 

@@ -137,14 +137,14 @@ class Drag_n_drop {
 	/**
 	 *
 	 * @param {HTMLElement} element
-	 * @param {{copy_element:boolean, custom_on_start:function, custom_on_drag:function, custom_on_end:function}} options
+	 * @param {{ [copy_element]:boolean, [custom_on_start]:function, [custom_on_drag]:function, [custom_on_end]:function }} [options]
 	 * @returns {boolean}
 	 */
 	make_draggable(element, options = {}) {
-		const copy_element = options.copy_element || false;
-		const custom_on_start = options.custom_on_start || null;
-		const custom_on_drag = options.custom_on_drag || null;
-		const custom_on_end = options.custom_on_end || null;
+		const copy_element = options.copy_element ?? false;
+		const custom_on_start = options.custom_on_start ?? null;
+		const custom_on_drag = options.custom_on_drag ?? null;
+		const custom_on_end = options.custom_on_end ?? null;
 		if (typeof element.tagName === "string") {
 			// Common
 			element.setAttribute("on_drag_copy", copy_element ? "true" : "false");
@@ -214,11 +214,11 @@ class Drag_n_drop {
 
 	/**
 	 * @param {HTMLElement} element
-	 * @param {{ custom_on_drag_over:function, custom_on_drop:function }} options
+	 * @param {{ [custom_on_drag_over]:function, [custom_on_drop]:function }} [options]
 	 */
 	make_droppable(element, options = {}) {
-		const custom_on_drag_over = options.custom_on_drag_over || null;
-		const custom_on_drop = options.custom_on_drop || null;
+		const custom_on_drag_over = options.custom_on_drag_over ?? null;
+		const custom_on_drop = options.custom_on_drop ?? null;
 		if (typeof element.tagName === "string") {
 			const handler = this;
 

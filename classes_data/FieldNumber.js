@@ -5,6 +5,10 @@ class FieldNumber extends Field {
 	Min
 	Max
 
+	/**
+	 * @param {string} label
+	 * @param {{ [label_short]:string, [key]:string, [value]:any, [rollable]:string, [min]:number, [max]:number, [size]:int, [sub_field]:Field, [sub_field_divider]:string, [formula]:string }} [options]
+	 */
 	constructor(label, options = {}) {
 		super(label, options);
 		this.Value = options.value || 0;
@@ -19,6 +23,10 @@ class FieldNumber extends Field {
 		return entry;
 	}
 
+	/**
+	 * @param {{ [ignore_sub_field]:boolean, callbacks:{ [onblur]:function, [onfocus]:function, [onkeydown]:function, [onkeyup]:function } }} [options]
+	 * @returns {HTMLInputElement[]}
+	 */
 	GetInput(options = {}) {
 		let inputs = super.GetInput(options);
 		let value_hold = null;
