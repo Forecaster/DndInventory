@@ -223,7 +223,8 @@ input.failed {
 }
 
 .notification.warning {
-	background-color: #e04e17;
+	background-color: #f3642b;
+	color: black;
 }
 
 .notification.info {

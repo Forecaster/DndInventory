@@ -29,3 +29,21 @@
 	background-color: white;
 	color: black;
 }
+
+input.field-input {
+	margin-left: 8px;
+	background-color: transparent;
+	color: white;
+	border: none;
+	border-bottom: 1px dashed white;
+	width: calc(10ch + 8px);
+}
+
+input.field-input:focus-visible {
+	outline: none;
+}
+
+input.field-input[readonly] {
+	cursor: not-allowed;
+	border: none;
+}

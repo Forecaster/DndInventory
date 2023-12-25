@@ -90,17 +90,23 @@ class Ruleset {
 					"Slashing:number",
 					"Thunder:number"
 				], action: (character, fields) => {
+					const msg_duration = 30;
 					const resistant = character.GetField("Resistances", "");
 					const immune = character.GetField("Immunities", "");
 					let total_damage = 0;
 					for (let field in fields) {
+						let starting_damage = parseFloat(fields[field]);
 						let val = parseFloat(fields[field]);
 						if (isNaN(val))
 							val = 0;
-						if (resistant.toLowerCase().indexOf(field.toLowerCase()) !== -1)
+						if (resistant.toLowerCase().indexOf(field.toLowerCase()) !== -1) {
 							val = Math.floor(val * .5);
-						if (immune.toLowerCase().indexOf(field.toLowerCase()) !== -1)
+							notifications.Success(`Resisted ${val} ${field} damage!`, { duration: msg_duration });
+						}
+						if (immune.toLowerCase().indexOf(field.toLowerCase()) !== -1) {
 							val = 0;
+							notifications.Success(`Completely resisted ${starting_damage} ${field} damage!`, { duration: msg_duration });
+						}
 						total_damage += val;
 					}
 					console.debug(character);
@@ -109,12 +115,14 @@ class Ruleset {
 					console.debug("temp", temp_hp);
 					let diff = temp_hp - total_damage;
 					console.debug("diff", diff);
-					if (diff >= 0)
+					if (diff >= 0) {
 						character.SetField("Temporary Hit points", diff);
-					else {
+						notifications.Warning(`Took ${total_damage} damage. All to temp. hit points.`, { duration: msg_duration });
+					} else {
 						character.SetField("Temporary Hit points", 0);
 						diff *= -1;
 						character.SetField("Wounds", character.GetField("Wounds", 0) + diff);
+						notifications.Error(`Took ${total_damage} damage! ${total_damage - diff} absorbed by temp. hit points.`, { duration: msg_duration });
 					}
 				}}
 		],

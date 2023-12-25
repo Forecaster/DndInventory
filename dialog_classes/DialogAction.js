@@ -47,7 +47,7 @@ class DialogAction extends Dialog {
 
 			const input = document.createElement("input");
 			input.setAttribute("label", split[0]);
-			input.className = "action_field";
+			input.className = "action_field field-input";
 			input.type = split[1];
 			cell2.appendChild(input);
 		})

@@ -117,24 +117,6 @@
 		margin-bottom: 4px;
 		font-size: 16pt;
 	}
-
-	input {
-		margin-left: 8px;
-		background-color: transparent;
-		color: white;
-		border: none;
-		border-bottom: 1px dashed white;
-		width: calc(10ch + 8px);
-	}
-
-	input:focus-visible {
-		outline: none;
-	}
-
-	input[readonly] {
-		cursor: not-allowed;
-		border: none;
-	}
 }
 
 .character_notes_input {

@@ -24,7 +24,6 @@ class Notifications {
 	 * @param {string} msg
 	 * @param {{ [duration]:number, [type]:"info"|"success"|"warning"|"error", [id]:string }} [options]
 	 * `id` may be a custom id assigned to the message. This id can be used with `RemoveMessageByID` to clear the message before the timer expires.
-	 * @constructor
 	 */
 	Send(msg, options = {}) {
 		const duration = options.duration ?? 5;
@@ -47,21 +46,41 @@ class Notifications {
 		}, (duration * 1000) + 5100);
 	}
 
+	/**
+	 * @param {string} msg
+	 * @param {{ [duration]:number, [type]:"info"|"success"|"warning"|"error", [id]:string }} [options]
+	 * `id` may be a custom id assigned to the message. This id can be used with `RemoveMessageByID` to clear the message before the timer expires.
+	 */
 	Success(msg, options = {}) {
 		options.type = "success";
 		this.Send(msg, options);
 	}
 
+	/**
+	 * @param {string} msg
+	 * @param {{ [duration]:number, [type]:"info"|"success"|"warning"|"error", [id]:string }} [options]
+	 * `id` may be a custom id assigned to the message. This id can be used with `RemoveMessageByID` to clear the message before the timer expires.
+	 */
 	Error(msg, options = {}) {
 		options.type = "error";
 		this.Send(msg, options);
 	}
 
+	/**
+	 * @param {string} msg
+	 * @param {{ [duration]:number, [type]:"info"|"success"|"warning"|"error", [id]:string }} [options]
+	 * `id` may be a custom id assigned to the message. This id can be used with `RemoveMessageByID` to clear the message before the timer expires.
+	 */
 	Warning(msg, options = {}) {
 		options.type = "warning";
 		this.Send(msg, options);
 	}
 
+	/**
+	 * @param {string} msg
+	 * @param {{ [duration]:number, [type]:"info"|"success"|"warning"|"error", [id]:string }} [options]
+	 * `id` may be a custom id assigned to the message. This id can be used with `RemoveMessageByID` to clear the message before the timer expires.
+	 */
 	Info(msg, options = {}) {
 		options.type = "info";
 		this.Send(msg, options);

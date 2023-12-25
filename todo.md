@@ -8,6 +8,8 @@
     * [ ] Enable styling the inputs differently by allow custom classes
   * [ ] Add dice roller widget (get dice values from ruleset along with common modifiers (advantage, disadvantage, etc)?)
     * [ ] Add ability to apply result of dice to field (drag n drop?)
+  * [ ] Implement log history panel that shows past notifications for the session
+    * [ ] Open-able through icon in the top right where notifications appear
 
 * Refactor characters
   * [ ] Implement saving and loading of characters (to backend)

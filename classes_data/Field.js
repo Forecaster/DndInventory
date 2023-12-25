@@ -100,6 +100,7 @@ class Field extends Serializable {
 		input.setAttribute("field-key", this.Key);
 		input.title = this.Label;
 		input.classList.add("field");
+		input.classList.add("field-input");
 		if (options.hasOwnProperty("callbacks")) {
 			if (options.callbacks.hasOwnProperty("onclick"))
 				input.addEventListener("click", options.callbacks.onclick);
