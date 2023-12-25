@@ -8,7 +8,7 @@ class Character extends Serializable {
 	/** @var {FieldGroup[]} */
 	FieldGroups
 	/** @var {FieldGroup[]} */
-	FieldsCustom
+	FieldsGroupsCustom
 	/** @var {{ name:string, fields:string[] }[]} PinGroups
 	 * May contain any number of groups with an array of fields.
 	 * Group names can be anything, but two core groups may be used: `status` which is used to display character status indicators
@@ -28,18 +28,17 @@ class Character extends Serializable {
 
 	/**
 	 * @param {string} name
-	 * @param {{ [id]:string|null, [owner]:string|null, [fields]:FieldGroup[], [pin_groups]:{ name:string, fields:string[] }[] }} [options]
+	 * @param {{ [id]:string|null, [owner]:string|null, [fields]:FieldGroup[], [notes]:string, [pin_groups]:{ name:string, fields:string[] }[] }} [options]
 	 */
 	constructor(name, options = {}) {
 		super();
 		this.Name = name;
 		this.ID = options.id ?? null;
 		this.Owner = options.owner ?? null;
-		this.FieldGroups = options.fields ?? active_ruleset.CharacterFields;
-		let inv_size = active_ruleset.InventorySize(session, this);
-		this.CharacterInventory = new Inventory("Backpack", { sectors: inv_size });
+		this.FieldGroups = options.fields ?? [];
 		this.PinGroups = options.pin_groups ?? [];
 		this.LastSync = new Date();
+		this.Notes = options.notes ?? "";
 
 		this.KeyFields = {};
 		this.FieldGroups.forEach((group) => {
@@ -50,6 +49,13 @@ class Character extends Serializable {
 				}
 			});
 		});
+	}
+
+	/**
+	 * @param {Ruleset} ruleset
+	 */
+	SetFromRuleset(ruleset) {
+		this.FieldGroups = ruleset.CharacterFields;
 	}
 
 	toString() {
