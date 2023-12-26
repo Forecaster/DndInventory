@@ -123,7 +123,7 @@ class Field extends Serializable {
 	GetInput(options = {}) {
 		let inputs = [];
 		let input = document.createElement("input");
-		// input.id = "field_" + (this.Key || this.Label);
+		input.id = "field_" + this.InstanceID;
 		input.setAttribute("field-type", this.constructor.name);
 		input.setAttribute("field-label", this.Label);
 		input.setAttribute("field-key", this.Key);
@@ -208,8 +208,7 @@ class Field extends Serializable {
 	}
 
 	Refresh() {
-		const label = this.Label.replace("'", "\\\'")
-		const elements = Array.from(document.querySelectorAll(`[field-label='${label}']`));
+		const elements = Array.from(document.querySelectorAll(`#field_${this.InstanceID}`));
 		elements.forEach((element) => {
 			element.value = this.Value;
 		})

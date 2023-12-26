@@ -8,7 +8,7 @@ class Ruleset {
 	CharacterFields
 	/** @var {{ name:string, fields:string[] }[]} */
 	DefaultPins
-	/** @var {{ label:string, icon:string, key:string, fields:string[], action:function(character:Character, fields:object) }[]} */
+	/** @var {{ label:string, icon:string, key:string, fields:{ label:string, [show_label]:boolean, items:string[] }[], action:function(character:Character, fields:object) }[]} */
 	Actions
 	/** @var {Function} */
 	LevelFormula
@@ -55,15 +55,18 @@ class Ruleset {
 				new FieldText("Race"),
 				new FieldText("Class"),
 				new FieldText("Alignment"),
+				new FieldNumber("Level", { key: "level", size: 3 }),
 				new FieldText("Background"),
-				new FieldText("Proficiency Bonus", { key: "prof", size: 2 }),
+				new FieldText("Proficiency Bonus", { key: "prof", size: 3 }),
 				new FieldText("Walk speed"),
 				new FieldText("Swim speed"),
 				new FieldText("Fly speed"),
-				new FieldText("Resistances"),
-				new FieldText("Immunities"),
+				new FieldText("Resistances", { key: "resist" }),
+				new FieldText("Immunities", { key: "immune" }),
+				new FieldText("Weaknesses", { key: "weak" }),
 				new FieldNumber("Armor class", { label_short: "AC", key: "ac", size: 3 }),
-				new FieldText("Hit dice", { key: "hd", size: 2 }),
+				new FieldText("Hit dice count", { key: "hdc", size: 3 }),
+				new FieldNumber("Hit dice size", { key: "hds", size: 3 }),
 				new FieldNumber("Wounds", { label_short: "W", key: "wounds", size: 3, sub_fields: [ new FieldNumber("Hit points", { label_short: "Max", key: "hpmax", size: 3, formula: "" }) ], sub_field_divider: "/" }),
 				new FieldNumber("Temporary Hit points", { label_short: "Temp. HP", key: "thp", size: 3 })
 			)
@@ -75,55 +78,76 @@ class Ruleset {
 		actions: [
 			{ label: "Take damage", icon: "game-icons/carl-olsen/crossbow.png", key: "damage",
 				fields: [
-					"Magical:number",
-					"Acid:number",
-					"Bludgeoning:number",
-					"Cold:number",
-					"Fire:number",
-					"Force:number",
-					"Lightning:number",
-					"Necrotic:number",
-					"Piercing:number",
-					"Poison:number",
-					"Psychic:number",
-					"Radiant:number",
-					"Slashing:number",
-					"Thunder:number"
+					{ label: "Data", show_label: false, items: [
+						"Character:character",
+						]},
+					{ label: "Damage", items: [
+						"Magical:number",
+						"Acid:number",
+						"Bludgeoning:number",
+						"Cold:number",
+						"Fire:number",
+						"Force:number",
+						"Lightning:number",
+						"Necrotic:number",
+						"Piercing:number",
+						"Poison:number",
+						"Psychic:number",
+						"Radiant:number",
+						"Slashing:number",
+						"Thunder:number"
+						]}
 				], action: (character, fields) => {
+					character = characters[fields['Data']['Character']];
 					const msg_duration = 30;
-					const resistant = character.GetField("Resistances", "");
-					const immune = character.GetField("Immunities", "");
+					const resistant = character.GetField("Resistances", "") ?? "";
+					const immune = character.GetField("Immunities", "") ?? "";
+					const weak = character.GetField("Weaknesses", "") ?? "";
 					let total_damage = 0;
-					for (let field in fields) {
-						let starting_damage = parseFloat(fields[field]);
-						let val = parseFloat(fields[field]);
-						if (isNaN(val))
+					for (let field in fields['Damage']) {
+						const f = fields['Damage'][field];
+						let starting_damage = parseFloat(f);
+						let val = parseFloat(f);
+						if (isNaN(val)) {
 							val = 0;
-						if (resistant.toLowerCase().indexOf(field.toLowerCase()) !== -1) {
-							val = Math.floor(val * .5);
-							notifications.Success(`Resisted ${val} ${field} damage!`, { duration: msg_duration });
-						}
-						if (immune.toLowerCase().indexOf(field.toLowerCase()) !== -1) {
+						} else if (str_contains(immune, field)) {
 							val = 0;
 							notifications.Success(`Completely resisted ${starting_damage} ${field} damage!`, { duration: msg_duration });
+						} else if (str_contains(resistant, field)) {
+							val = Math.floor(val * .5);
+							if (val > 0)
+								notifications.Success(`Resisted ${val} ${field} damage!`, { duration: msg_duration });
+						} else if (str_contains(weak, field)) {
+							val = Math.floor(val * 2);
+							notifications.Error(`Weakness against ${field}! Took ${val} ${field} damage!`);
 						}
 						total_damage += val;
 					}
-					console.debug(character);
 					console.debug(fields, total_damage);
+					if (total_damage === 0)
+						return;
 					let temp_hp = character.GetField("Temporary Hit points", 0);
 					console.debug("temp", temp_hp);
 					let diff = temp_hp - total_damage;
 					console.debug("diff", diff);
 					if (diff >= 0) {
 						character.SetField("Temporary Hit points", diff);
-						notifications.Warning(`Took ${total_damage} damage. All to temp. hit points.`, { duration: msg_duration });
+						notifications.Warning(`${character.Name} took ${total_damage} damage. Fully absorbed by temp. hit points.`, { duration: msg_duration });
 					} else {
 						character.SetField("Temporary Hit points", 0);
 						diff *= -1;
-						character.SetField("Wounds", character.GetField("Wounds", 0) + diff);
-						notifications.Error(`Took ${total_damage} damage! ${total_damage - diff} absorbed by temp. hit points.`, { duration: msg_duration });
+						character.SetField("Wounds", parseFloat(character.GetField("Wounds", 0)) + diff);
+						let extra = "";
+						if (total_damage - diff > 0)
+							extra = ` ${total_damage - diff} absorbed by temp. hit points.`;
+						notifications.Error(`${character.Name} took ${total_damage} damage!` + extra, { duration: msg_duration });
 					}
+				}},
+			{ label: "Recover", icon: "", key: "recover", fields: [
+				"Character:character",
+				"Dice amount:number"
+				], action: (character, fields) => {
+					character = characters[fields['Character']];
 				}}
 		],
 		/**
@@ -187,7 +211,7 @@ class Ruleset {
 	 * [max_hit_points_formula]:function,
 	 * [inventory_size_formula]:string,
 	 * [default_pins]:{ name:string, fields:string[] }[],
-	 * [actions]:{ label:string, [icon]:string, key:string, fields:string[], action:function(character:Character, fields:object)}[],
+	 * [actions]:{ label:string, [icon]:string, key:string, fields:{ label:string, [show_label]:boolean, items:string[] }[], action:function(character:Character, fields:object)}[],
 	 * }} [options]
 	 * Omitted options are assigned null values.
 	 * @constructor

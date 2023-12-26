@@ -179,8 +179,8 @@ class Character extends Serializable {
 			this.FieldGroups.forEach((group) => {
 				group.Fields.forEach((field) => {
 					if (Character.#SetField(field, label, value)) {
-						this.PrimeUpload();
 						return_value = true;
+						setTimeout(() => { this.PrimeUpload() }, 1000);
 					}
 				});
 			});

@@ -102,3 +102,16 @@ function parse_math_string(input_string) {
 	return parseFloat(input_string);
 }
 
+/**
+ * @param {string} str
+ * @param {string} subject
+ * @param {{ [lowercase]:boolean }} [options]
+ */
+function str_contains(str, subject, options = {}) {
+	const lowercase = options.lowercase ?? true;
+	if (lowercase) {
+		str = str.toLowerCase();
+		subject = subject.toLowerCase();
+	}
+	return str.indexOf(subject) !== -1;
+}
