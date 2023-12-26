@@ -9,8 +9,32 @@ class Field extends Serializable {
 	Key
 	/** @var {int} */
 	Size
-	/** @var {Field} */
-	SubField
+	/** @var {Field[]} */
+	_SubFields
+	/**
+	 * @returns {Field[]}
+	 */
+	get SubFields() {
+		return this._SubFields;
+	}
+
+	/**
+	 * @param {Field[]} v
+	 */
+	set SubFields(v) {
+		const root = this;
+		this._SubFields = v;
+		this._SubFields._push = this._SubFields.push;
+		this._SubFields.push = function(...items) {
+			items.forEach((item) => {
+				root._SubFields._push(item);
+				item.AddParentObject(root);
+			});
+		}
+		this._SubFields.forEach((field) => {
+			field.AddParentObject(this);
+		})
+	}
 	/** @var {string} */
 	SubFieldDivider
 	/** @var {any} */
@@ -22,11 +46,14 @@ class Field extends Serializable {
 	/** @var {string[]} */
 	FormulaKeys
 	/** @var {FieldGroup[]} */
-	ParentGroups = [];
+	ParentObjects = [];
+
+	/** @var {Field[]} */
+	static FieldCollection = [];
 
 	/**
 	 * @param {string} label
-	 * @param {{ [label_short]:string, [key]:string, [value]:any, [rollable]:string, [size]:int, [sub_field]:Field, [sub_field_divider]:string, [formula]:string }} [options]
+	 * @param {{ [label_short]:string, [key]:string, [value]:any, [rollable]:string, [size]:int, [sub_fields]:Field[], [sub_field_divider]:string, [formula]:string }} [options]
 	 */
 	constructor(label, options = {}) {
 		super();
@@ -35,15 +62,17 @@ class Field extends Serializable {
 		this.Key = options.key ?? null;
 		this.Rollable = options.rollable ?? null;
 		this.Size = options.size ?? null;
-		this.SubField = options.sub_field ?? null;
+		this.SubFields = options.sub_fields ?? [];
 		this.SubFieldDivider = options.sub_field_divider ?? "";
 		this.Value = options.value ?? null;
 		this.Formula = options.formula ?? null;
+
+		Field.FieldCollection.push(this);
 	}
 
-	AddParentGroup(group) {
-		if (this.ParentGroups.indexOf(group) === -1)
-			this.ParentGroups.push(group);
+	AddParentObject(object) {
+		if (this.ParentObjects.indexOf(object) === -1)
+			this.ParentObjects.push(object);
 	}
 
 	/**
@@ -94,7 +123,7 @@ class Field extends Serializable {
 	GetInput(options = {}) {
 		let inputs = [];
 		let input = document.createElement("input");
-		input.id = "field_" + (this.Key || this.Label);
+		// input.id = "field_" + (this.Key || this.Label);
 		input.setAttribute("field-type", this.constructor.name);
 		input.setAttribute("field-label", this.Label);
 		input.setAttribute("field-key", this.Key);
@@ -124,8 +153,11 @@ class Field extends Serializable {
 			this.ParseFormula();
 		}
 		inputs.push(input);
-		if (this.SubField !== null && !options.ignore_sub_field)
-			inputs = inputs.concat(this.SubField.GetInput(options));
+		if (Array.isArray(this.SubFields) && !options.ignore_sub_field) {
+			this.SubFields.forEach((sub_field) => {
+				inputs.concat(sub_field.GetField(options));
+			})
+		}
 		return inputs;
 	}
 
@@ -135,15 +167,19 @@ class Field extends Serializable {
 	 * @constructor
 	 */
 	AppendInput(container, options = {}) {
-		options.ignore_sub_field = true;
 		const input = this.GetInput(options)[0];
 		container.appendChild(input);
-		if (this.SubField !== null) {
+		if (Array.isArray(this.SubFields)) {
 			const divider = document.createElement("span");
 			divider.innerText = this.SubFieldDivider;
 			divider.style.marginLeft = "8px";
 			container.appendChild(divider);
-			this.SubField.AppendInput(container, options);
+
+			const sub_field_container = document.createElement("span");
+			container.appendChild(sub_field_container);
+			this.SubFields.forEach((sub_field) => {
+				sub_field.AppendInput(sub_field_container, options);
+			})
 		}
 	}
 
@@ -153,13 +189,16 @@ class Field extends Serializable {
 	 */
 	Clone() {
 		const constructor = Object.getPrototypeOf(this).constructor;
-		let sub = null;
-		if (this.SubField !== null)
-			sub = this.SubField.Clone();
+		let sub = [];
+		if (Array.isArray(this.SubFields)) {
+			this.SubFields.forEach((sub_field) => {
+				sub.push(sub_field.Clone());
+			})
+		}
 		return new constructor(this.Label, {
 			key: this.Key,
 			rollable: this.Rollable,
-			sub_field: sub,
+			sub_fields: sub,
 			sub_field_divider: this.SubFieldDivider,
 			value: this.Value,
 			size: this.Size,
@@ -176,20 +215,71 @@ class Field extends Serializable {
 		})
 	}
 
-	static FindValueOfKey(key) {
-		return null;
+	/**
+	 * @param {string} key
+	 * @param {{ [sum_values]:boolean, [return_array]:boolean, [return_last]:boolean, [default_value]:string|number }} [options]
+	 */
+	static FindValueOfKey(key, options = {}) {
+		const sum_values = options.sum_values ?? false;
+		const return_array = options.return_array ?? false;
+		const return_last = options.return_last ?? false;
+		const default_value = options.default_value ?? null;
+		const values = [];
+		key = key.toLowerCase();
+		const parts = key.split(".");
+		const last_part = parts.pop();
+		let fields = []
+		Field.FieldCollection.forEach((field) => {
+			if (field.Key !== null && field.Key === last_part) {
+				fields.push(field);
+			}
+		})
+
+		let candidates = [];
+		while (parts.length > 0) {
+			const next_part = parts.pop();
+			fields.forEach((field) => {
+				if (field) {}
+			})
+		}
+
+		return -1;
+
+		if (sum_values) {
+			let sum = 0;
+			values.forEach((value) => {
+				value = parseFloat(value);
+				if (!isNaN(value))
+					sum += value
+			});
+			return sum;
+		}
+		if (return_array)
+			return values;
+		if (values.length === 0)
+			return default_value;
+		if (return_last)
+			return values.pop();
+		return values[0];
 	}
 
-	ParseFormula() {
-		const pattern_keys = /{([a-z_.]*)}/g;
+	static ParseFormula(formula) {
 		const pattern_groups = /.*\(.*?\).*/g;
-		let formula = this.CustomFormula ?? this.Formula ?? null;
+		const pattern_keys = /{([a-z_.]*)}/g;
 		if (formula !== null) {
 			let keys = Array.from(formula.matchAll(pattern_keys));
 			keys.forEach((match) => {
-				const key_value = Field.FindValueOfKey(match[1]);
-				console.debug("value", key_value);
+				const key = match[1];
+				const split = key.split(".");
+				console.debug(split);
+				const key_value = Field.FindValueOfKey(key);
+				console.debug("value", key, key_value);
 			})
 		}
+	}
+
+	ParseFormula() {
+		let formula = this.CustomFormula ?? this.Formula ?? null;
+		// Field.ParseFormula(formula);
 	}
 }

@@ -4,9 +4,16 @@ class FieldGroup extends Serializable {
 	Label
 	/** @var {Field[]} */
 	_Fields
+	/**
+	 * @returns {Field[]}
+	 */
 	get Fields() {
 		return this._Fields;
 	}
+
+	/**
+	 * @param {Field[]} v
+	 */
 	set Fields(v) {
 		const root = this;
 		this._Fields = v;
@@ -14,11 +21,11 @@ class FieldGroup extends Serializable {
 		this._Fields.push = function(...items) {
 			items.forEach((item) => {
 				root._Fields._push(item);
-				item.AddParentGroup(root);
+				item.AddParentObject(root);
 			});
 		}
 		this._Fields.forEach((field) => {
-			field.AddParentGroup(this);
+			field.AddParentObject(this);
 		})
 	}
 	ParentObjects = [];

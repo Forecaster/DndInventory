@@ -180,7 +180,10 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<div class="menu_divider"></div>
 	<div class="menu_label">Actions</div>
 	<div id="menu_container_actions"></div>
-	<div class="menu_button menu_end" onclick="session.Leave();">Leave session</div>
+	<div class="menu_end">
+		<div class="menu_button">Console</div>
+		<div class="menu_button" onclick="session.Leave();">Leave session</div>
+	</div>
 </div>
 <div class="main_container">
 <!--	<div id="equipment_container" style="background-image: url('images/character.png'); width: 408px; height: 503px; position: relative; float: left;"></div>-->
@@ -268,6 +271,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	let characters = [];
 	let fields = [];
 	let current_pin_group = "default";
+	Field.FieldCollection = []; // This resets FieldCollection to remove ruleset fields.
 	// </editor-fold>
 
 	// <editor-fold desc="Setup testing parameters">
