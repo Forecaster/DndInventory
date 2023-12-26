@@ -164,11 +164,11 @@ class Character extends Serializable {
 			field.Refresh();
 			return true;
 		} else if (Array.isArray(field.SubFields)) {
-			let value = false;
+			let return_value = false;
 			field.SubFields.forEach((sub_field) => {
-				value = value || Character.#SetField(sub_field, label, value);
+				return_value = return_value || Character.#SetField(sub_field, label, value);
 			})
-			return value;
+			return return_value;
 		}
 		return false;
 	}
