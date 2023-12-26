@@ -76,11 +76,14 @@ class Serializable {
 		return new_array;
 	}
 
+	static ResolvedObjects
 	static #DeserializeResolveReferences(subject) {
 		if (typeof subject === "undefined")
 			return undefined;
 		if (subject === null)
 			return null;
+		if (Serializable.ResolvedObjects.indexOf(subject) !== -1)
+			return subject;
 		// console.debug("Resolve references in ", subject);
 		let object = subject;
 		if (typeof subject === "object") {
@@ -99,7 +102,50 @@ class Serializable {
 				}
 			}
 		}
+		Serializable.ResolvedObjects.push(object);
 		return object;
+	}
+
+	static #DeserializeRemoveDuplicateReferences(subject) {
+		if (typeof subject === "undefined")
+			return undefined;
+		if (subject === null)
+			return null;
+		if (typeof subject !== "object")
+			return subject;
+		if (Serializable.ResolvedObjects.indexOf(subject) !== -1)
+			return subject;
+		console.debug("Remove duplicates in", subject);
+		Serializable.ResolvedObjects.push(subject);
+		if (Array.isArray(subject)) {
+			const array_references = [];
+			const new_array = [];
+			console.debug("Array");
+			for (let i = 0; i < subject.length; i++) {
+				console.debug(subject[i]);
+				if (subject[i] instanceof Serializable) {
+					if (array_references.indexOf(subject[i].InstanceID) === -1) {
+						new_array.push(Serializable.#DeserializeRemoveDuplicateReferences(subject[i]));
+						array_references.push(subject[i].InstanceID);
+					}
+				} else if (!subject[i].hasOwnProperty("class_reference")) {
+					new_array.push(Serializable.#DeserializeRemoveDuplicateReferences(subject[i]));
+				} else {
+					if (array_references.indexOf(subject[i].class_reference) === -1) {
+						array_references.push(subject[i].class_reference);
+						new_array.push(subject[i]);
+					}
+				}
+			}
+			console.debug("post_array", new_array);
+			Serializable.ResolvedObjects.push(new_array);
+			return new_array;
+		} else {
+			for (const property in subject) {
+				subject[property] = Serializable.#DeserializeRemoveDuplicateReferences(subject[property]);
+			}
+		}
+		return subject;
 	}
 
 	/**
@@ -138,8 +184,12 @@ class Serializable {
 			}
 		}
 
-		if (!sub_call)
+		if (!sub_call) {
+			Serializable.ResolvedObjects = [];
+			object = this.#DeserializeRemoveDuplicateReferences(object);
+			Serializable.ResolvedObjects = [];
 			object = this.#DeserializeResolveReferences(object);
+		}
 		return object;
 	}
 }

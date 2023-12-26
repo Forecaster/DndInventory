@@ -1,0 +1,59 @@
+
+@keyframes notification_fade {
+	0% {
+		opacity: 1;
+		display: block;
+	}
+
+	99% {
+		opacity: 0;
+		display: block;
+	}
+	100% {
+		opacity: 0;
+		display: none;
+	}
+}
+
+.notifications_container {
+	margin: inherit; /* Overrides default popover style */
+	top: 10px;
+	left: auto;
+	right: 10px;
+	background-color: transparent;
+	padding: 10px;
+	border: none;
+}
+
+.notification {
+	width: fit-content;
+	display: block;
+	border-bottom-left-radius: 10px;
+	border: 1px dotted white;
+	background-color: #313131;
+	color: white;
+	padding: 5px;
+	margin: 5px;
+	animation-name: notification_fade;
+	animation-duration: 5s;
+	animation-fill-mode: forwards;
+	animation-delay: 5s;
+}
+
+.notification.success {
+	background-color: forestgreen;
+}
+
+.notification.error {
+	background-color: #b40000;
+}
+
+.notification.warning {
+	background-color: #f3642b;
+	color: black;
+}
+
+.notification.info {
+	background-color: dodgerblue;
+}
+

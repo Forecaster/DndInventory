@@ -6,7 +6,24 @@ class Character extends Serializable {
 	/** @var {string} */
 	Owner
 	/** @var {FieldGroup[]} */
-	FieldGroups
+	_FieldGroups
+	get FieldGroups() {
+		return this._FieldGroups;
+	}
+	set FieldGroups(v) {
+		const root = this;
+		this._FieldGroups = v;
+		this._FieldGroups._push = this._FieldGroups.push;
+		this._FieldGroups.push = function(...items) {
+			items.forEach((item) => {
+				root._FieldGroups._push(item);
+				item.AddParent(root);
+			});
+		}
+		this._FieldGroups.forEach((field) => {
+			field.AddParent(this);
+		})
+	}
 	/** @var {FieldGroup[]} */
 	FieldsGroupsCustom
 	/** @var {{ name:string, fields:string[] }[]} PinGroups

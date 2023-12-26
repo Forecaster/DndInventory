@@ -319,7 +319,7 @@ class Ruleset {
 						cloned_field.Value = c_field.Value;
 						cloned_field.CustomFormula = c_field.CustomFormula;
 						set_subfield_values(c_field, cloned_field);
-						new_group.AddField(cloned_field);
+						new_group.Fields.push(cloned_field);
 					} else {
 						// console.info("Append missing field to character fields", field.Label);
 						c_group.Fields.push(field);

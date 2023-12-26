@@ -20,6 +20,10 @@ class Session {
 	/** @var {int} */
 	#LastSync
 
+	static #StorageKeyToken = "session_token";
+	static #StorageKeyID = "session_id";
+	static #StorageKeyPlayer = "session_player";
+
 	static GenerateSessionID(callback) {
 		API.Call("get_new_session_id", {
 			success: (payload) => {
@@ -66,23 +70,23 @@ class Session {
 	StorePreviousSession(token = null, id = null, player = null) {
 		if (token !== null)
 			this.Token = token;
-		localStorage.setItem("session_token", this.Token);
+		localStorage.setItem(Session.#StorageKeyToken, this.Token);
 		if (id !== null)
 			this.ID = id;
-		localStorage.setItem("session_id", this.ID);
+		localStorage.setItem(Session.#StorageKeyID, this.ID);
 		if (player !== null)
 			this.CurrentUsername = player;
 		if (this.CurrentUsername !== null)
-			localStorage.setItem("session_player", this.CurrentUsername);
+			localStorage.setItem(Session.#StorageKeyPlayer, this.CurrentUsername);
 		else
-			localStorage.removeItem("session_player");
+			localStorage.removeItem(Session.#StorageKeyPlayer);
 	}
 
 	static RetrievePreviousSession() {
 		const session = new Session("");
-		session.Token = localStorage.getItem("session_token");
-		session.ID = localStorage.getItem("session_id");
-		session.CurrentUsername = localStorage.getItem("session_player");
+		session.Token = localStorage.getItem(Session.#StorageKeyToken);
+		session.ID = localStorage.getItem(Session.#StorageKeyID);
+		session.CurrentUsername = localStorage.getItem(Session.#StorageKeyPlayer);
 		return session;
 	}
 
@@ -242,5 +246,12 @@ class Session {
 			});
 			container.appendChild(btn);
 		})
+	}
+
+	Leave() {
+		localStorage.removeItem(Session.#StorageKeyToken);
+		localStorage.removeItem(Session.#StorageKeyID);
+		localStorage.removeItem(Session.#StorageKeyPlayer);
+		window.location.reload();
 	}
 }

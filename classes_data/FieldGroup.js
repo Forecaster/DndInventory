@@ -3,7 +3,24 @@ class FieldGroup extends Serializable {
 	/** @var {string} */
 	Label
 	/** @var {Field[]} */
-	Fields
+	_Fields
+	get Fields() {
+		return this._Fields;
+	}
+	set Fields(v) {
+		const root = this;
+		this._Fields = v;
+		this._Fields._push = this._Fields.push;
+		this._Fields.push = function(...items) {
+			items.forEach((item) => {
+				root._Fields._push(item);
+				item.AddParentGroup(root);
+			});
+		}
+		this._Fields.forEach((field) => {
+			field.AddParentGroup(this);
+		})
+	}
 	ParentObjects = [];
 
 	/**
@@ -20,12 +37,9 @@ class FieldGroup extends Serializable {
 		}
 	}
 
-	/**
-	 * @param {Field} field
-	 */
-	AddField(field) {
-		field.AddParentGroup(this);
-		this.Fields.push(field);
+	AddParent(parent) {
+		if (this.ParentObjects.indexOf(parent) === -1)
+			this.ParentObjects.push(parent);
 	}
 
 	Clone() {
@@ -33,7 +47,7 @@ class FieldGroup extends Serializable {
 		/** @var {FieldGroup} */
 		let entry = new constructor(this.Label);
 		this.Fields.forEach((field) => {
-			entry.AddField(field.Clone());
+			entry.Fields.push(field.Clone());
 		})
 		return entry;
 	}

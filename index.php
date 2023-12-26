@@ -23,6 +23,8 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<link rel="stylesheet" href="styles/inputs.css" />
 	<link rel="stylesheet" href="styles/inventory.css" />
 	<link rel="stylesheet" href="styles/character.css" />
+	<link rel="stylesheet" href="styles/menu.css" />
+	<link rel="stylesheet" href="styles/notifications.css" />
 
 
 	<script src="functions.js"></script>
@@ -178,6 +180,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<div class="menu_divider"></div>
 	<div class="menu_label">Actions</div>
 	<div id="menu_container_actions"></div>
+	<div class="menu_button menu_end" onclick="session.Leave();">Leave session</div>
 </div>
 <div class="main_container">
 <!--	<div id="equipment_container" style="background-image: url('images/character.png'); width: 408px; height: 503px; position: relative; float: left;"></div>-->
