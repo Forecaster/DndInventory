@@ -40,8 +40,6 @@ class Character extends Serializable {
 	UploadTimer
 	/** @var {Date} */
 	LastSync
-	/** @var {{ key, Field }} */
-	KeyFields
 
 	/**
 	 * @param {string} name
@@ -56,16 +54,6 @@ class Character extends Serializable {
 		this.PinGroups = options.pin_groups ?? [];
 		this.LastSync = new Date();
 		this.Notes = options.notes ?? "";
-
-		this.KeyFields = {};
-		this.FieldGroups.forEach((group) => {
-			group.Fields.forEach((field) => {
-				let items = Character.#GetKeyAndField(field);
-				for (let key in items) {
-					this.KeyFields[key] = items[key];
-				}
-			});
-		});
 	}
 
 	/**

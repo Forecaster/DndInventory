@@ -41,6 +41,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="classes_structure/Notifications.js"></script>
 	<script src="classes_structure/Tooltip.js"></script>
 	<script src="classes_structure/PopoutElement.js"></script>
+	<script src="classes_data/FieldStore.js"></script>
 	<script src="classes_data/Serializable.js"></script>
 	<script src="classes_data/Character.js"></script>
 	<script src="classes_data/CharacterHealth.js"></script>
@@ -271,7 +272,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	let characters = [];
 	let fields = [];
 	let current_pin_group = "default";
-	Field.FieldCollection = []; // This resets FieldCollection to remove ruleset fields.
+	FieldStore.Enabled = true; // FieldStore is disabled by default to prevent adding fields from rulesets.
 	// </editor-fold>
 
 	// <editor-fold desc="Setup testing parameters">
