@@ -115,14 +115,14 @@ class Serializable {
 			return subject;
 		if (Serializable.ResolvedObjects.indexOf(subject) !== -1)
 			return subject;
-		console.debug("Remove duplicates in", subject);
+		// console.debug("Remove duplicates in", subject);
 		Serializable.ResolvedObjects.push(subject);
 		if (Array.isArray(subject)) {
 			const array_references = [];
 			const new_array = [];
-			console.debug("Array");
+			// console.debug("Array");
 			for (let i = 0; i < subject.length; i++) {
-				console.debug(subject[i]);
+				// console.debug(subject[i]);
 				if (subject[i] instanceof Serializable) {
 					if (array_references.indexOf(subject[i].InstanceID) === -1) {
 						new_array.push(Serializable.#DeserializeRemoveDuplicateReferences(subject[i]));
@@ -137,7 +137,7 @@ class Serializable {
 					}
 				}
 			}
-			console.debug("post_array", new_array);
+			// console.debug("post_array", new_array);
 			Serializable.ResolvedObjects.push(new_array);
 			return new_array;
 		} else {
