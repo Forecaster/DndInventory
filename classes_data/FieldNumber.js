@@ -1,7 +1,5 @@
 
 class FieldNumber extends Field {
-	/** @var {number} */
-	Value
 	Min
 	Max
 

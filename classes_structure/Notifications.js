@@ -12,6 +12,10 @@ class Notifications {
 	 * @param {string|HTMLElement} element_or_selector
 	 */
 	constructor(element_or_selector) {
+		const link = document.createElement("link");
+		link.rel = "stylesheet";
+		link.href = "styles/notifications.css";
+		document.head.appendChild(link);
 		if (typeof element_or_selector === "string")
 			this.Container = document.querySelector(element_or_selector);
 		else

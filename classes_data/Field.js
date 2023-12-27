@@ -13,9 +13,9 @@ class Field extends Serializable {
 	set Key(v) {
 		this._Key = v;
 		if (this._Key === null) {
-			FieldStore.RemoveKeyField(this);
+			KeyStore.RemoveKeyProvider(this);
 		} else {
-			FieldStore.AddKeyField(this);
+			KeyStore.AddKeyProver(this);
 		}
 	}
 	/** @var {int} */
@@ -48,11 +48,40 @@ class Field extends Serializable {
 	/** @var {string} */
 	SubFieldDivider
 	/** @var {any} */
-	Value
+	_Value
+	get Value() {
+		return this._Value;
+	}
+	set Value(v) {
+		this._Value = v;
+		this.Refresh();
+		KeyStore.UpdateFieldsUsingKey(this.Key);
+		const c = this.GetParentCharacter();
+		if (c !== null)
+			KeyStore.UpdateFieldsUsingKey(c.Name.toLowerCase() + "." + this.Key);
+	}
 	/** @var {string} */
-	Formula
+	_Formula
+	get Formula() {
+		return this._Formula;
+	}
+	set Formula(v) {
+		this._Formula = v;
+		KeyStore.FormulaGetKeys(v).forEach((key) => {
+			KeyStore.AddKeyUser(key, this);
+		})
+	}
 	/** @var {string} */
-	CustomFormula
+	_UserFormula
+	get UserFormula() {
+		return this._UserFormula;
+	}
+	set UserFormula(v) {
+		this._UserFormula = v;
+		KeyStore.FormulaGetKeys(v).forEach((key) => {
+			KeyStore.AddKeyUser(key, this);
+		})
+	}
 	/** @var {string[]} */
 	FormulaKeys
 	/** @var {FieldGroup[]} */
@@ -74,12 +103,13 @@ class Field extends Serializable {
 		this.Value = options.value ?? null;
 		this.Formula = options.formula ?? null;
 
-		FieldStore.AddField(this);
+		KeyStore.AddField(this);
 	}
 
 	AddParentObject(object) {
-		if (this.ParentObjects.indexOf(object) === -1)
+		if (this.ParentObjects.indexOf(object) === -1) {
 			this.ParentObjects.push(object);
+		}
 	}
 
 	/**
@@ -214,29 +244,38 @@ class Field extends Serializable {
 		});
 	}
 
-	Refresh() {
+	Refresh(value = null) {
+		if (value !== null)
+			this._Value = value;
 		const elements = Array.from(document.querySelectorAll(`#field_${this.InstanceID}`));
 		elements.forEach((element) => {
 			element.value = this.Value;
 		})
 	}
 
-	static ParseFormula(formula) {
-		const pattern_keys = /{([a-z_.]*)}/;
-
-		let match = true;
-		while (match) {
-			match = formula.match(pattern_keys);
-			if (match !== null) {
-				const value = FieldStore.FindValueOfKey(match[1], {default_value: 0});
-				formula = formula.replace(match[0], value);
-			}
-		}
-		return parse_math_string(formula);
+	ParseFormula() {
+		let formula = this.UserFormula ?? this.Formula ?? null;
+		if (formula === null || formula === "")
+			return;
+		const result = KeyStore.ParseFormula(formula);
+		// console.debug("formula_result", result);
+		this.Refresh(result);
 	}
 
-	ParseFormula() {
-		let formula = this.CustomFormula ?? this.Formula ?? null;
-		// Field.ParseFormula(formula);
+	GetParentCharacter(subject = null) {
+		if (subject === null)
+			subject = this;
+		if (!Array.isArray(subject.ParentObjects))
+			return null;
+		for (let i = 0; i < subject.ParentObjects.length; i++) {
+			if (subject.ParentObjects[i] instanceof Character)
+				return subject.ParentObjects[i];
+			else {
+				const sub_object = this.GetParentCharacter(subject.ParentObjects[i]);
+				if (sub_object instanceof Character)
+					return sub_object;
+			}
+		}
+		return null;
 	}
 }

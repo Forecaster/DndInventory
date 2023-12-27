@@ -48,7 +48,7 @@ function match(t, s, lowercase = false) {
  */
 function parse_math_string(input_string) {
 	input_string = input_string.replaceAll(" ", "");
-	const pattern_groups = /\((.*)\)/;
+	const pattern_groups = /([a-z]*)\((.*)\)/;
 	const pattern_exponents = /(\d+)\^(\d+)/;
 	const pattern_multiplication = /(\d+)\*(\d+)/;
 	const pattern_division = /(\d+)\/(\d+)/;
@@ -60,7 +60,13 @@ function parse_math_string(input_string) {
 	while (match) {
 		match = input_string.match(pattern_groups);
 		if (match !== null) {
-			const solved_group = parse_math_string(match[1]);
+			let solved_group = parse_math_string(match[2]);
+			if (match[1] === "ceil")
+				solved_group = Math.ceil(solved_group)
+			else if (match[1] === "floor")
+				solved_group = Math.floor(solved_group);
+			else if (match[1] === "round")
+				solved_group = Math.round(solved_group);
 			input_string = input_string.replace(match[0], solved_group.toString());
 		}
 	}

@@ -18,10 +18,16 @@ class Character extends Serializable {
 			items.forEach((item) => {
 				root._FieldGroups._push(item);
 				item.AddParent(root);
+				item.Fields.forEach((field) => {
+					KeyStore.AddKeyProver(field);
+				})
 			});
 		}
-		this._FieldGroups.forEach((field) => {
-			field.AddParent(this);
+		this._FieldGroups.forEach((group) => {
+			group.AddParent(this);
+			group.Fields.forEach((field) => {
+				KeyStore.AddKeyProver(field);
+			})
 		})
 	}
 	/** @var {FieldGroup[]} */
@@ -149,7 +155,7 @@ class Character extends Serializable {
 	static #SetField(field, label, value) {
 		if (field.Label === label) {
 			field.Value = value;
-			field.Refresh();
+			// field.Refresh();
 			return true;
 		} else if (Array.isArray(field.SubFields)) {
 			let return_value = false;

@@ -173,14 +173,17 @@ class Serializable {
 		}
 
 		for (const property in subject) {
+			let set_property = property;
+			if (property.indexOf("_") === 0)
+				set_property = property.replace("_", "");
 			const prop = subject[property];
 			if (typeof prop === "object") {
 				if (Array.isArray(prop))
-					object[property] = this.#DeserializeArray(prop);
+					object[set_property] = this.#DeserializeArray(prop);
 				else
-					object[property] = Serializable.Deserialize(prop, { sub_call: true });
+					object[set_property] = Serializable.Deserialize(prop, { sub_call: true });
 			} else {
-				object[property] = prop;
+				object[set_property] = prop;
 			}
 		}
 

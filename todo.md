@@ -5,11 +5,17 @@
   * [ ] Implement a dropdown field
   * [ ] Implement searchable dropdown field
   * [ ] Fields should be usable outside of characters
-    * [ ] Enable styling the inputs differently by allow custom classes
+    * [ ] Enable styling the inputs differently by allowing custom classes
   * [ ] Add dice roller widget (get dice values from ruleset along with common modifiers (advantage, disadvantage, etc)?)
     * [ ] Add ability to apply result of dice to field (drag n drop?)
   * [ ] Implement log history panel that shows past notifications for the session
     * [ ] Open-able through icon in the top right where notifications appear
+  * [ ] Implement FieldRow (formerly RepeatableFieldGroup)
+    * [ ] A template contains one or more fields
+    * [ ] Values are stored in as an array
+    * [ ] FieldRow can have a key
+      * [ ] Keys can accept an index by appending `(n)` to the end, this can be used to access array values
+        * [ ] For array values references without an index the array should be joined with `,` before being returned as a string
 
 * Refactor characters
   * [ ] Implement saving and loading of characters (to backend)
@@ -37,6 +43,6 @@
   * [x] Implement character ownership
     * [x] Display owner on character card
   * [ ] Implement popout for text inputs
-    * [ ] Store history in localStorage
+    * [x] Store history in localStorage
     * [ ] Popout should allow deleting entries from history
     * [x] Remember past session IDs and show in popout on ID inputs

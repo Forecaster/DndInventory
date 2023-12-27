@@ -23,33 +23,33 @@ class Ruleset {
 		encumbrance_options: [ 'Standard', 'Variant' ],
 		character_fields: [
 			new FieldGroup("Attributes",
-				new FieldNumber("Strength", 			{ label_short: "Str", key: "str", size: 2, sub_fields: [ new FieldNumber("Strength Check", 			{key: "c", size: 2, }), new FieldNumber("Strength Save",				{key: "s", size: 2}) ]}),
-				new FieldNumber("Dexterity", 			{ label_short: "Dex", key: "dex", size: 2, sub_fields: [ new FieldNumber("Dexterity Check",			{key: "c", size: 2, }), new FieldNumber("Dexterity Save", 			{key: "s", size: 2}) ]}),
-				new FieldNumber("Constitution", 	{ label_short: "Con", key: "con", size: 2, sub_fields: [ new FieldNumber("Constitution Check", 	{key: "c", size: 2, }), new FieldNumber("Constitution Save",		{key: "s", size: 2}) ]}),
-				new FieldNumber("Intelligence", 	{ label_short: "Int", key: "int", size: 2, sub_fields: [ new FieldNumber("Intelligence Check", 	{key: "c", size: 2, }), new FieldNumber("Intelligence Save",		{key: "s", size: 2}) ]}),
-				new FieldNumber("Wisdom", 				{ label_short: "Wis", key: "wis", size: 2, sub_fields: [ new FieldNumber("Wisdom Check", 				{key: "c", size: 2, }), new FieldNumber("Wisdom Save",					{key: "s", size: 2}) ]}),
-				new FieldNumber("Charisma", 			{ label_short: "Cha", key: "cha", size: 2, sub_fields: [ new FieldNumber("Charisma Check", 			{key: "c", size: 2, }), new FieldNumber("Charisma Save",				{key: "s", size: 2}) ]}),
+				new FieldNumber("Strength", 			{ label_short: "Str", value: 10, key: "str", size: 2, sub_fields: [ new FieldNumber("Strength bonus", 			{ key: "str.b", formula: "floor(({str}-10)/2)", size: 2 }), new FieldNumber("Strength Save",				{ key: "str.s", formula: "{str.b}+({prof}*{str.p})", size: 2 }), new FieldNumber("Strength Save Proficiency", 			{ key: "str.p", size: 2, value: 0 }) ]}),
+				new FieldNumber("Dexterity", 			{ label_short: "Dex", value: 10, key: "dex", size: 2, sub_fields: [ new FieldNumber("Dexterity bonus",			{ key: "dex.b", formula: "floor(({dex}-10)/2)", size: 2 }), new FieldNumber("Dexterity Save",			{ key: "dex.s", formula: "{dex.b}+({prof}*{dex.p})", size: 2 }), new FieldNumber("Dexterity Save Proficiency", 		{ key: "dex.p", size: 2, value: 0 }) ]}),
+				new FieldNumber("Constitution", 	{ label_short: "Con", value: 10, key: "con", size: 2, sub_fields: [ new FieldNumber("Constitution bonus", 	{ key: "con.b", formula: "floor(({con}-10)/2)", size: 2 }), new FieldNumber("Constitution Save",		{ key: "con.s", formula: "{con.b}+({prof}*{con.p})", size: 2 }), new FieldNumber("Constitution Save Proficiency", 	{ key: "con.p", size: 2, value: 0 }) ]}),
+				new FieldNumber("Intelligence", 	{ label_short: "Int", value: 10, key: "int", size: 2, sub_fields: [ new FieldNumber("Intelligence bonus", 	{ key: "int.b", formula: "floor(({int}-10)/2)", size: 2 }), new FieldNumber("Intelligence Save",		{ key: "int.s", formula: "{int.b}+({prof}*{int.p})", size: 2 }), new FieldNumber("Intelligence Save Proficiency", 	{ key: "int.p", size: 2, value: 0 }) ]}),
+				new FieldNumber("Wisdom", 				{ label_short: "Wis", value: 10, key: "wis", size: 2, sub_fields: [ new FieldNumber("Wisdom bonus", 				{ key: "wis.b", formula: "floor(({wis}-10)/2)", size: 2 }), new FieldNumber("Wisdom Save",					{ key: "wis.s", formula: "{wis.b}+({prof}*{wis.p})", size: 2 }), new FieldNumber("Wisdom Save Proficiency", 				{ key: "wis.p", size: 2, value: 0 }) ]}),
+				new FieldNumber("Charisma", 			{ label_short: "Cha", value: 10, key: "cha", size: 2, sub_fields: [ new FieldNumber("Charisma bonus", 			{ key: "cha.b", formula: "floor(({cha}-10)/2)", size: 2 }), new FieldNumber("Charisma Save",				{ key: "cha.s", formula: "{cha.b}+({prof}*{cha.p})", size: 2 }), new FieldNumber("Charisma Save Proficiency", 			{ key: "cha.p", size: 2, value: 0 }) ]}),
 			),
 			new FieldGroup("Skills",
-				new FieldNumber("Acrobatics", 			{key: "acrobatics", 				rollable: "d20 + {f}", formula: "{acrobatics.p}*{prof}+{dex}", size: 4, sub_fields: [ new FieldNumber("Acrobatics Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Animal Handling", 	{key: "animal_handling", 	rollable: "d20 + {f}", formula: "{animal_handling.p}*{prof}+{wis}", size: 4, sub_fields: [ new FieldNumber("Animal Handling Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Arcana", 					{key: "arcana", 						rollable: "d20 + {f}", formula: "{arcana.p}*{prof}+{int}", size: 4, sub_fields: [ new FieldNumber("Arcana Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Athletics", 				{key: "athletics", 				rollable: "d20 + {f}", formula: "{athletics.p}*{prof}+{str}", size: 4, sub_fields: [ new FieldNumber("Athletics Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Deception", 				{key: "deception", 				rollable: "d20 + {f}", formula: "{deception.p}*{prof}+{cha}", size: 4, sub_fields: [ new FieldNumber("Deception Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("History", 					{key: "history", 					rollable: "d20 + {f}", formula: "{history.p}*{prof}+{int}", size: 4, sub_fields: [ new FieldNumber("History Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Insight", 					{key: "insight", 					rollable: "d20 + {f}", formula: "{insight.p}*{prof}+{wis}", size: 4, sub_fields: [ new FieldNumber("Insight Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Intimidation", 		{key: "intimidation", 			rollable: "d20 + {f}", formula: "{intimidation.p}*{prof}+{cha}", size: 4, sub_fields: [ new FieldNumber("Intimidation Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Investigation", 		{key: "investigation", 		rollable: "d20 + {f}", formula: "{investigation.p}*{prof}+{int}", size: 4, sub_fields: [ new FieldNumber("Investigation Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Medicine", 				{key: "medicine", 					rollable: "d20 + {f}", formula: "{medicine.p}*{prof}+{wis}", size: 4, sub_fields: [ new FieldNumber("Medicine Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Nature", 					{key: "nature", 						rollable: "d20 + {f}", formula: "{nature.p}*{prof}+{int}", size: 4, sub_fields: [ new FieldNumber("Nature Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Perception", 			{key: "perception", 				rollable: "d20 + {f}", formula: "{perception.p}*{prof}+{wis}", size: 4, sub_fields: [ new FieldNumber("Perception Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Performance", 			{key: "performance", 			rollable: "d20 + {f}", formula: "{performance.p}*{prof}+{cha}", size: 4, sub_fields: [ new FieldNumber("Performance Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Persuasion", 			{key: "persuasion", 				rollable: "d20 + {f}", formula: "{persuasion.p}*{prof}+{cha}", size: 4, sub_fields: [ new FieldNumber("Persuasion Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Religion", 				{key: "religion", 					rollable: "d20 + {f}", formula: "{religion.p}*{prof}+{int}", size: 4, sub_fields: [ new FieldNumber("Religion Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Sleight of Hand", 	{key: "sleight_of_hand", 	rollable: "d20 + {f}", formula: "{sleight_of_hand.p}*{prof}+{dex}", size: 4, sub_fields: [ new FieldNumber("Sleight of Hand Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Stealth", 					{key: "stealth", 					rollable: "d20 + {f}", formula: "{stealth.p}*{prof}+{dex}", size: 4, sub_fields: [ new FieldNumber("Stealth Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Survival", 				{key: "survival", 					rollable: "d20 + {f}", formula: "{survival.p}*{prof}+{wis}", size: 4, sub_fields: [ new FieldNumber("Survival Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]}),
-				new FieldNumber("Thieves' Tools", 	{key: "thieves_tools", 		rollable: "d20 + {f}", formula: "{thieves_tools.p}*{prof}+{dex}", size: 4, sub_fields: [ new FieldNumber("Thieves' Tools Proficiency", {key: "p", min: 0, max: 2, size: 3}) ]})
+				new FieldNumber("Acrobatics", 			{key: "acrobatics", 				rollable: "d20 + {f}", formula: "{acrobatics.p}*{prof}+{dex.b}", size: 4, sub_fields: [ new FieldNumber("Acrobatics Proficiency", {key: "acrobatics.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Animal Handling", 	{key: "animal_handling", 	rollable: "d20 + {f}", formula: "{animal_handling.p}*{prof}+{wis.b}", size: 4, sub_fields: [ new FieldNumber("Animal Handling Proficiency", {key: "animal_handling.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Arcana", 					{key: "arcana", 						rollable: "d20 + {f}", formula: "{arcana.p}*{prof}+{int.b}", size: 4, sub_fields: [ new FieldNumber("Arcana Proficiency", {key: "arcana.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Athletics", 				{key: "athletics", 				rollable: "d20 + {f}", formula: "{athletics.p}*{prof}+{str.b}", size: 4, sub_fields: [ new FieldNumber("Athletics Proficiency", {key: "athletics.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Deception", 				{key: "deception", 				rollable: "d20 + {f}", formula: "{deception.p}*{prof}+{cha.b}", size: 4, sub_fields: [ new FieldNumber("Deception Proficiency", {key: "deception.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("History", 					{key: "history", 					rollable: "d20 + {f}", formula: "{history.p}*{prof}+{int.b}", size: 4, sub_fields: [ new FieldNumber("History Proficiency", {key: "history.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Insight", 					{key: "insight", 					rollable: "d20 + {f}", formula: "{insight.p}*{prof}+{wis.b}", size: 4, sub_fields: [ new FieldNumber("Insight Proficiency", {key: "insight.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Intimidation", 		{key: "intimidation", 			rollable: "d20 + {f}", formula: "{intimidation.p}*{prof}+{cha.b}", size: 4, sub_fields: [ new FieldNumber("Intimidation Proficiency", {key: "intimidation.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Investigation", 		{key: "investigation", 		rollable: "d20 + {f}", formula: "{investigation.p}*{prof}+{int.b}", size: 4, sub_fields: [ new FieldNumber("Investigation Proficiency", {key: "investigation.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Medicine", 				{key: "medicine", 					rollable: "d20 + {f}", formula: "{medicine.p}*{prof}+{wis.b}", size: 4, sub_fields: [ new FieldNumber("Medicine Proficiency", {key: "medicine.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Nature", 					{key: "nature", 						rollable: "d20 + {f}", formula: "{nature.p}*{prof}+{int.b}", size: 4, sub_fields: [ new FieldNumber("Nature Proficiency", {key: "nature.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Perception", 			{key: "perception", 				rollable: "d20 + {f}", formula: "{perception.p}*{prof}+{wis.b}", size: 4, sub_fields: [ new FieldNumber("Perception Proficiency", {key: "perception.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Performance", 			{key: "performance", 			rollable: "d20 + {f}", formula: "{performance.p}*{prof}+{cha.b}", size: 4, sub_fields: [ new FieldNumber("Performance Proficiency", {key: "performance.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Persuasion", 			{key: "persuasion", 				rollable: "d20 + {f}", formula: "{persuasion.p}*{prof}+{cha.b}", size: 4, sub_fields: [ new FieldNumber("Persuasion Proficiency", {key: "persuasion.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Religion", 				{key: "religion", 					rollable: "d20 + {f}", formula: "{religion.p}*{prof}+{int.b}", size: 4, sub_fields: [ new FieldNumber("Religion Proficiency", {key: "religion.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Sleight of Hand", 	{key: "sleight_of_hand", 	rollable: "d20 + {f}", formula: "{sleight_of_hand.p}*{prof}+{dex.b}", size: 4, sub_fields: [ new FieldNumber("Sleight of Hand Proficiency", {key: "sleight_of_hand.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Stealth", 					{key: "stealth", 					rollable: "d20 + {f}", formula: "{stealth.p}*{prof}+{dex.b}", size: 4, sub_fields: [ new FieldNumber("Stealth Proficiency", {key: "stealth.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Survival", 				{key: "survival", 					rollable: "d20 + {f}", formula: "{survival.p}*{prof}+{wis.b}", size: 4, sub_fields: [ new FieldNumber("Survival Proficiency", {key: "survival.p", min: 0, max: 2, size: 3}) ]}),
+				new FieldNumber("Thieves' Tools", 	{key: "thieves_tools", 		rollable: "d20 + {f}", formula: "{thieves_tools.p}*{prof}+{dex.b}", size: 4, sub_fields: [ new FieldNumber("Thieves' Tools Proficiency", {key: "thieves_tools.p", min: 0, max: 2, size: 3}) ]})
 			),
 			new FieldGroup("Misc",
 				new FieldText("Race"),
@@ -366,7 +366,7 @@ class Ruleset {
 					if (c_field !== null) {
 						const cloned_field = field.Clone();
 						cloned_field.Value = c_field.Value;
-						cloned_field.CustomFormula = c_field.CustomFormula;
+						cloned_field.UserFormula = c_field.UserFormula;
 						set_subfield_values(c_field, cloned_field);
 						new_group.Fields.push(cloned_field);
 					} else {

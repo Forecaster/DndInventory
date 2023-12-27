@@ -24,8 +24,6 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<link rel="stylesheet" href="styles/inventory.css" />
 	<link rel="stylesheet" href="styles/character.css" />
 	<link rel="stylesheet" href="styles/menu.css" />
-	<link rel="stylesheet" href="styles/notifications.css" />
-
 
 	<script src="functions.js"></script>
 	<script src="dialogs_session.js"></script>
@@ -41,7 +39,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="classes_structure/Notifications.js"></script>
 	<script src="classes_structure/Tooltip.js"></script>
 	<script src="classes_structure/PopoutElement.js"></script>
-	<script src="classes_data/FieldStore.js"></script>
+	<script src="classes_data/KeyStore.js"></script>
 	<script src="classes_data/Serializable.js"></script>
 	<script src="classes_data/Character.js"></script>
 	<script src="classes_data/CharacterHealth.js"></script>
@@ -272,11 +270,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	let characters = [];
 	let fields = [];
 	let current_pin_group = "default";
-	FieldStore.Enabled = true; // FieldStore is disabled by default to prevent adding fields from rulesets.
-	// </editor-fold>
-
-	// <editor-fold desc="Setup testing parameters">
-	// session = new Session("test-id", { name: "Test session", ruleset: "Dnd5e", encumbrance_option: 0 });
+	KeyStore.Enabled = true; // FieldStore is disabled by default to prevent adding fields from rulesets.
 	// </editor-fold>
 
 	const drag_handler = new Drag_n_drop({ on_drag_end: (event, handler) => {
