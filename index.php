@@ -81,9 +81,9 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 <dialog id="dialog_action" class="dialog">
 	<h4 id="dialog_action_title"></h4>
 	<table id="dialog_action_fields"></table>
-	<div>
+	<div style="margin-top: 20px;">
 		<span class="btn btn-primary" id="dialog_action_go">TAKE ACTION</span>
-		<span class="btn btn-gray" id="dialog_action_cancel">CANCEL</span>
+		<span class="btn btn-secondary" id="dialog_action_cancel">CLOSE</span>
 	</div>
 </dialog>
 <!-- <editor-fold desc="Dialogs session"> -->

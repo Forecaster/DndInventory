@@ -151,7 +151,7 @@ class KeyStore {
 			return;
 		const fields = KeyStore.KeyUsers[key];
 		if (Array.isArray(fields)) {
-			console.debug("Update fields using key!", key, fields);
+			// console.debug("Update fields using key!", key, fields);
 			fields.forEach((field) => {
 				field.ParseFormula();
 			})

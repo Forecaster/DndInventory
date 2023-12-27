@@ -6,6 +6,8 @@ class FieldRow extends Field {
 	RowLabel
 	/** @var {string[]} */
 	RowTemplate
+	/** @var {object[]} */
+	RowData
 
 	/**
 	 * @param {string} label The header for the group of rows.

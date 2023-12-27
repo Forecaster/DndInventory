@@ -58,4 +58,14 @@ class FieldGroup extends Serializable {
 		})
 		return entry;
 	}
+
+	FindFieldByLabel(label, lowercase = true) {
+		for (let i = 0; i < this.Fields.length; i++) {
+			const field = this.Fields[i];
+			const f = field.FindFieldByLabel(label, lowercase);
+			if (f !== null)
+				return f;
+		}
+		return null;
+	}
 }

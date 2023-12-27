@@ -99,7 +99,8 @@ class DialogAction extends Dialog {
 			})
 			group_values[group.getAttribute("group-label")] = values;
 		})
-		this.CurrentAction.action(characters[0], group_values);
-		this.Close();
+		const result = this.CurrentAction.action(characters[0], group_values);
+		if (result)
+			this.Close();
 	}
 }

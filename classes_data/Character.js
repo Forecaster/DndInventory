@@ -184,17 +184,26 @@ class Character extends Serializable {
 		return return_value;
 	}
 
-	GetField(label, default_value = null) {
-		let value = default_value;
-		if (Array.isArray(this.FieldGroups)) {
-			this.FieldGroups.forEach((group) => {
-				group.Fields.forEach((field) => {
-					if (field.Label === label)
-						value = field.Value;
-				});
-			});
+	FindFieldByLabel(label, lowercase = true) {
+		for (let i = 0; i < this.FieldGroups.length; i++) {
+			const group = this.FieldGroups[i];
+			const field = group.FindFieldByLabel(label, lowercase);
+			if (field !== null)
+				return field;
 		}
-		return value;
+		return null;
+	}
+
+	/**
+	 * @param {string} label
+	 * @param {*} default_value
+	 * @returns {*}
+	 */
+	GetFieldValueByLabel(label, default_value = 0) {
+		const field = this.FindFieldByLabel(label);
+		if (field !== null)
+			return field.Value;
+		return default_value;
 	}
 
 	GetCompactElement(update_target = null) {

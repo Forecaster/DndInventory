@@ -283,4 +283,22 @@ class Field extends Serializable {
 		}
 		return null;
 	}
+
+	FindFieldByLabel(label, lowercase = true) {
+		if (lowercase) {
+			if (this.Label.toLowerCase() === label.toLowerCase())
+				return this;
+		} else {
+			if (this.Label === label)
+				return this;
+		}
+		if (Array.isArray(this.SubFields)) {
+			for (let i = 0; i < this.SubFields.length; i++) {
+				const field = this.SubFields[i].FindFieldByLabel(label);
+				if (field !== null)
+					return field;
+			}
+		}
+		return null;
+	}
 }

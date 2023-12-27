@@ -72,8 +72,8 @@ class Ruleset {
 			)
 		],
 		default_pins: [
-			{name: "info", fields: ["Race", "Class", "Background", "Proficiency Bonus"]},
-			{name: "status", fields: ["Armor Class", "Wounds", "Temporary Hit points"]}
+			{name: "info", fields: [ "Race", "Class", "Background", "Proficiency Bonus", "Level" ]},
+			{name: "status", fields: [ "Wounds", "Temporary Hit points", "Armor class" ]}
 		],
 		actions: [
 			{ label: "Take damage", icon: "game-icons/carl-olsen/crossbow.png", key: "damage",
@@ -100,9 +100,9 @@ class Ruleset {
 				], action: (character, fields) => {
 					character = characters[fields['Data']['Character']];
 					const msg_duration = 30;
-					const resistant = character.GetField("Resistances", "") ?? "";
-					const immune = character.GetField("Immunities", "") ?? "";
-					const weak = character.GetField("Weaknesses", "") ?? "";
+					const resistant = character.GetFieldValueByLabel("Resistances", "");
+					const immune = character.GetFieldValueByLabel("Immunities", "");
+					const weak = character.GetFieldValueByLabel("Weaknesses", "");
 					let total_damage = 0;
 					for (let field in fields['Damage']) {
 						const f = fields['Damage'][field];
@@ -112,21 +112,21 @@ class Ruleset {
 							val = 0;
 						} else if (str_contains(immune, field)) {
 							val = 0;
-							notifications.Success(`Completely resisted ${starting_damage} ${field} damage!`, { duration: msg_duration });
+							notifications.Success(`${character.Name} completely resisted ${starting_damage} ${field} damage!`, { duration: msg_duration });
 						} else if (str_contains(resistant, field)) {
 							val = Math.floor(val * .5);
 							if (val > 0)
 								notifications.Success(`Resisted ${val} ${field} damage!`, { duration: msg_duration });
 						} else if (str_contains(weak, field)) {
 							val = Math.floor(val * 2);
-							notifications.Error(`Weakness against ${field}! Took ${val} ${field} damage!`);
+							notifications.Error(`${character.Name} is weak against ${field}! Took ${val} ${field} damage!`);
 						}
 						total_damage += val;
 					}
 					console.debug(fields, total_damage);
 					if (total_damage === 0)
 						return;
-					let temp_hp = character.GetField("Temporary Hit points", 0);
+					let temp_hp = character.GetFieldValueByLabel("Temporary Hit points", 0);
 					console.debug("temp", temp_hp);
 					let diff = temp_hp - total_damage;
 					console.debug("diff", diff);
@@ -136,12 +136,22 @@ class Ruleset {
 					} else {
 						character.SetField("Temporary Hit points", 0);
 						diff *= -1;
-						character.SetField("Wounds", parseFloat(character.GetField("Wounds", 0)) + diff);
+						character.SetField("Wounds", parseFloat(character.GetFieldValueByLabel("Wounds", 0)) + diff);
 						let extra = "";
 						if (total_damage - diff > 0)
 							extra = ` ${total_damage - diff} absorbed by temp. hit points.`;
 						notifications.Error(`${character.Name} took ${total_damage} damage!` + extra, { duration: msg_duration });
 					}
+					let type = "info";
+					const max = character.GetFieldValueByLabel("Hit Points");
+					const rem = max - character.GetFieldValueByLabel("Wounds");
+					const percent = rem / max;
+					if (percent < .2)
+						type = "error";
+					else if (percent < .5)
+						type = "warning";
+					notifications.Send(`${character.Name} has ${rem} hit points left. (${Math.floor(percent*100)}%)`, { type: type, duration: msg_duration });
+					return false;
 				}},
 			{ label: "Recover", icon: "", key: "recover", fields: [
 				"Character:character",
