@@ -77,6 +77,10 @@ input.failed {
 	border-radius: 15px;
 	background-color: rgb(66, 66, 66);
 	color: white;
+	overflow: visible;
+	outline: none;
+	border: none;
+	box-shadow: 6px 6px rgba(255,255,255,0.03);
 }
 
 .dialog::backdrop {
@@ -123,12 +127,15 @@ input.failed {
 	z-index: 1000;
 	display: none;
 	position: absolute;
+	top: 0;
+	left: 0;
 	padding: 10px;
 	background-color: #1e1e1e;
 	color: white;
 	border: 1px dashed white;
 	border-bottom-left-radius: 15px;
 	border-top-right-radius: 15px;
+	width: 500px;
 }
 
 .action-group-label {

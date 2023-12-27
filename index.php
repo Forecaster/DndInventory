@@ -71,7 +71,8 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 </head>
 <body>
 <div id="notification_container" class="notifications_container" popover></div>
-<div id="popout_character_notes"></div>
+<div id="popout_character_notes" popover></div>
+<div id="popout_formula" popover></div>
 <dialog id="dialog_confirm" class="dialog">
 	<h2 id="confirm_title">Confirm title</h2>
 	<div id="confirm_container">
@@ -222,6 +223,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	const dialog_confirm = new DialogConfirm("#dialog_confirm");
 	const dialog_action = new DialogAction("#dialog_action");
 
+	// <editor-fold desc="Notes popout">
 	const textarea_notes = document.createElement("textarea");
 	let textarea_notes_timeout = null;
 	textarea_notes.classList.add("character_notes_input");
@@ -234,15 +236,45 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 		}, 2 * 1000);
 	});
 	const popout_character_notes = new PopoutElement("#popout_character_notes", {
-		elements: [
-			textarea_notes
-		],
+		elements: [ textarea_notes ],
 		callbacks: {
 			show: () => {
 				textarea_notes.value = popout_character_notes.Target.Notes;
 			}
 		}
 	});
+	// </editor-fold>
+
+	// <editor-fold desc="Formula popout">
+	const formula_label = document.createElement("label");
+	formula_label.innerText = "Formula";
+	const formula_field = document.createElement("input");
+	formula_field.classList.add("field-input");
+	formula_field.style.width = "98%";
+	formula_field.addEventListener("keyup", (event) => {
+		popout_formula.Target.UserFormula = event.target.value;
+		popout_formula.Target.ParseFormula();
+		popout_formula.Target.GetParentCharacter().PrimeUpload();
+	})
+	const formula_button_reset = document.createElement("div");
+	formula_button_reset.innerText = "Reset";
+	formula_button_reset.title = "Removes user formula and restores default (or no) formula.";
+	formula_button_reset.addEventListener("click", (event) => {
+		popout_formula.Target.UserFormula = null;
+		formula_field.value = popout_formula.Target.Formula;
+		popout_formula.Target.ParseFormula();
+		popout_formula.Target.GetParentCharacter().PrimeUpload();
+	})
+	const popout_formula = new PopoutElement("#popout_formula", {
+		elements: [ formula_label, formula_field, formula_button_reset ],
+		callbacks: {
+			show: () => {
+				formula_label.innerText = "Formula for " + popout_formula.Target.Label;
+				formula_field.value = popout_formula.Target.UserFormula ?? popout_formula.Target.Formula ?? "";
+			}
+		}
+	})
+	// </editor-fold>
 
 	const clock_real = document.querySelector("#clock_real");
 	// </editor-fold>

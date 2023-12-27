@@ -13,6 +13,14 @@ class Dialog {
 	/** @var {HTMLElement[]} */
 	Fields
 
+	static ActiveDialogs = [];
+
+	static GetLastActiveDialog() {
+		if (this.ActiveDialogs.length > 0)
+			return this.ActiveDialogs[this.ActiveDialogs.length - 1];
+		return null;
+	}
+
 	static #CheckProperty(object, property) {
 		return object !== null && object.hasOwnProperty(property) && object[property] !== null && object[property].hasOwnProperty("length");
 	}
@@ -169,10 +177,14 @@ class Dialog {
 
 	Open() {
 		this.DialogElement.showModal();
+		Dialog.ActiveDialogs.push(this);
 	}
 
 	Close() {
 		this.DialogElement.close();
+		const index = Dialog.ActiveDialogs.indexOf(this);
+		if (index >= 0)
+			Dialog.ActiveDialogs.splice(index, 1);
 	}
 
 	Save() {}

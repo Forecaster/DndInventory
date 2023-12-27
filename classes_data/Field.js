@@ -179,6 +179,10 @@ class Field extends Serializable {
 			if (options.callbacks.hasOwnProperty("onkeyup"))
 				input.addEventListener("keyup", options.callbacks.onkeyup);
 		}
+		input.addEventListener("dblclick", (event) => {
+			popout_formula.Target = this;
+			popout_formula.Show({ event: event });
+		});
 		if (this.Size)
 			input.style.width = `calc(${this.Size}ch + 8px)`;
 		if (this.Rollable)
@@ -260,6 +264,7 @@ class Field extends Serializable {
 		const result = KeyStore.ParseFormula(formula);
 		// console.debug("formula_result", result);
 		this.Refresh(result);
+		return result;
 	}
 
 	GetParentCharacter(subject = null) {

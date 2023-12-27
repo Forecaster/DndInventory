@@ -11,11 +11,16 @@ class PopoutElement {
 	 * @param {{ [text]:string, [html]:string, [elements]:HTMLElement[], [callbacks]:{ [show]:function } }} [options]
 	 */
 	constructor(element_or_selector, options = {}) {
-		if (typeof element_or_selector === "string")
-			this.Container = document.querySelector(element_or_selector);
-		else
-			this.Container = element_or_selector;
-		this.Container.classList.add("popout_element");
+		const popout = document.createElement("div");
+		popout.classList.add("popout_element");
+		document.body.appendChild(popout);
+		this.Container = popout;
+
+		// if (typeof element_or_selector === "string")
+		// 	this.Container = document.querySelector(element_or_selector);
+		// else
+		// 	this.Container = element_or_selector;
+		// this.Container.classList.add("popout_element");
 		this.SetContent(options);
 
 		if (typeof options.callbacks !== "undefined")
@@ -52,12 +57,25 @@ class PopoutElement {
 		let x = 0;
 		let y = 0;
 		if (typeof options.event !== "undefined" && options.event !== null) {
+			// console.debug(options.event);
 			options.position = {};
 			options.position.x = options.event.clientX;
 			options.position.y = options.event.clientY;
 		}
-		this.Container.style.top = options.position.y + "px";
-		this.Container.style.left = options.position.x + "px";
+		let offset_top = 0;
+		let offset_left = 0;
+		const dialog = Dialog.GetLastActiveDialog();
+		if (dialog !== null) {
+			offset_top = dialog.DialogElement.offsetTop;
+			offset_left = dialog.DialogElement.offsetLeft;
+		}
+
+		this.Container.style.top = (options.position.y - offset_top + 10) + "px";
+		this.Container.style.left = (options.position.x - offset_left + 10) + "px";
+		if (Dialog.ActiveDialogs.length > 0)
+			Dialog.ActiveDialogs[Dialog.ActiveDialogs.length - 1].DialogElement.appendChild(this.Container);
+		else
+			document.body.appendChild(this.Container);
 	}
 
 	/**
