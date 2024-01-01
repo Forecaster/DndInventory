@@ -60,8 +60,10 @@ class DialogSessionCreate extends Dialog {
 				this.Close();
 				dialog_session_create_join.Close();
 				notifications.Success("New session has been created!");
+				peer.RegisterHost(session.ID);
 			},
-			fail_callback: (result, msg) => {
+			fail_callback: (result, options = {}) => {
+				const msg = options.msg ?? "";
 				notifications.Error(msg);
 			}
 		})

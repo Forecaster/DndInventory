@@ -3,6 +3,8 @@ class DialogSessionLoad extends Dialog {
 	ElementSessionID
 	/** @var {HTMLInputElement} */
 	ElementGMPassword
+	/** @var {HTMLSelectElement} */
+	ElementSessionLength
 
 	ButtonLoad
 
@@ -11,6 +13,7 @@ class DialogSessionLoad extends Dialog {
 
 		this.ElementSessionID = this.DialogElement.querySelector("#session_load_id");
 		this.ElementGMPassword = this.DialogElement.querySelector("#session_load_pwd");
+		this.ElementSessionLength = this.DialogElement.querySelector("#session_load_session_length");
 
 		this.ButtonLoad = this.DialogElement.querySelector("#session_load_button");
 
@@ -61,8 +64,17 @@ class DialogSessionLoad extends Dialog {
 	}
 
 	Save() {
+		let session_length = {};
+		if (this.ElementSessionLength.value === "short")
+			session_length = { hours: 4 };
+		else if (this.ElementSessionLength.value === "medium")
+			session_length = { days: 1 };
+		else if (this.ElementSessionLength.value === "long")
+			session_length = { months: 1 };
+		else if (this.ElementSessionLength.value === "very_long")
+			session_length = { years: 1 };
 		session = new Session(this.ElementSessionID.value);
-		session.LoadSession({ gm_pwd: this.ElementGMPassword.value, success_callback: (() => {
+		session.LoadSession({ length: session_length, gm_pwd: this.ElementGMPassword.value, success_callback: (() => {
 				let history = localStorage.getItem("history_session_id");
 				if (history !== null) {
 					history = JSON.parse(history);
@@ -76,7 +88,8 @@ class DialogSessionLoad extends Dialog {
 				dialog_session_create_join.Close();
 				session.SyncCharacters();
 			}),
-			fail_callback: ((result, msg) => {
+			fail_callback: ((result, options = {}) => {
+				const msg = options.msg ?? "";
 				notifications.Error(msg);
 			})
 		});

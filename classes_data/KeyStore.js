@@ -176,11 +176,9 @@ class KeyStore {
 
 	/**
 	 * @param {string} formula
-	 * @returns {number}
+	 * @returns {string}
 	 */
-	static ParseFormula(formula) {
-		if (formula === null)
-			return 0;
+	static ParseFormulaKeys(formula) {
 		const pattern_keys = /{([a-z_.]*)}/;
 		let match = true;
 		while (match) {
@@ -190,6 +188,17 @@ class KeyStore {
 				formula = formula.replace(match[0], value);
 			}
 		}
-		return parse_math_string(formula);
+		return formula;
+	}
+
+	/**
+	 * @param {string} formula
+	 * @returns {number}
+	 */
+	static ParseFormula(formula) {
+		if (formula === null)
+			return 0;
+		formula = this.ParseFormulaKeys(formula);
+		return parse_math_expression(formula);
 	}
 }

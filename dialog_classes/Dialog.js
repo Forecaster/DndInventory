@@ -13,6 +13,15 @@ class Dialog {
 	/** @var {HTMLElement[]} */
 	Fields
 
+	/** @var {function} */
+	PreOpenAction
+	/** @var {function} */
+	PostOpenAction
+	/** @var {function} */
+	PreCloseAction
+	/** @var {function} */
+	PostCloseAction
+
 	static ActiveDialogs = [];
 
 	static GetLastActiveDialog() {
@@ -27,7 +36,9 @@ class Dialog {
 
 	/**
 	 * @param {HTMLElement|string} selector_or_element
-	 * @param {{ [external_buttons]: { [open]:(HTMLElement|string)[], [close]:(HTMLElement|string)[], [save]:(HTMLElement|string)[], [save_close]:(HTMLElement|string)[] }, [enter_submits]:boolean }} [options]
+	 * @param {{ [external_buttons]: { [open]:(HTMLElement|string)[], [close]:(HTMLElement|string)[],
+	 * [save]:(HTMLElement|string)[], [save_close]:(HTMLElement|string)[] }, [enter_submits]:boolean,
+	 * [pre_open]:function, [post_open]:function, [pre_close]:function, [post_close]:function }} [options]
 	 */
 	constructor(selector_or_element, options = {}) {
 		if (typeof selector_or_element === "string")
@@ -38,6 +49,10 @@ class Dialog {
 			console.warn("Invalid element or selector", selector_or_element);
 			return null;
 		}
+		this.PreOpenAction = options.pre_open ?? null;
+		this.PostOpenAction = options.post_open ?? null;
+		this.PreCloseAction = options.pre_close ?? null;
+		this.PostCloseAction = options.post_close ?? null;
 
 		let external_buttons = options.external_buttons ?? {};
 
@@ -176,15 +191,23 @@ class Dialog {
 	}
 
 	Open() {
+		if (typeof this.PreOpenAction === "function")
+			this.PreOpenAction();
 		this.DialogElement.showModal();
 		Dialog.ActiveDialogs.push(this);
+		if (typeof this.PostOpenAction === "function")
+			this.PostOpenAction();
 	}
 
 	Close() {
+		if (typeof this.PreCloseAction === "function")
+			this.PreCloseAction();
 		this.DialogElement.close();
 		const index = Dialog.ActiveDialogs.indexOf(this);
 		if (index >= 0)
 			Dialog.ActiveDialogs.splice(index, 1);
+		if (typeof this.PostCloseAction === "function")
+			this.PostCloseAction();
 	}
 
 	Save() {}

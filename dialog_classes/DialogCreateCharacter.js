@@ -5,9 +5,10 @@ class DialogCreateCharacter extends Dialog {
 
 	/**
 	 * @param {string} selector
+	 * @param {object} options
 	 */
-	constructor(selector) {
-		super(selector);
+	constructor(selector, options = {}) {
+		super(selector, options);
 		this.FieldCharacterName = this.DialogElement.querySelector("#dialog_create_character_name");
 		this.FieldCharacterName.onkeydown = (event) => { this.OnKeyDown(this, event) };
 	}

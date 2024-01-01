@@ -16,10 +16,13 @@ class DialogSessionCreateJoin extends Dialog {
 				notifications.Success("Session resumed!");
 				session.SyncCharacters();
 			},
-			fail_callback: (result, msg, silent) => {
+			fail_callback: (result, options = {}) => {
+				const silent = options.silent ?? false;
+				const msg = options.msg ?? "";
+				const data = options.data ?? "";
 				if (!silent)
 					notifications.Error(`Failed to resume previous session! Error: ${msg}`);
-				console.error(result, msg);
+				console.error(result, msg, data);
 				super.Open();
 			}
 		});

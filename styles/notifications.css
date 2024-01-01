@@ -14,9 +14,27 @@
 	}
 }
 
+@keyframes background_transition {
+	0% { background-position: 0 50% }
+	50% { background-position: 100% 50% }
+	100% { background-position: 0 50% }
+}
+
+@keyframes wiggle {
+	0% { rotate: -10deg; }
+	50% { rotate: 10deg; }
+	100% { rotate: -10deg; }
+}
+
+@keyframes sad_die {
+	0% { rotate: 0deg; translate: 0 8px }
+	50% { rotate: 5deg; }
+	100% { rotate: 5deg; translate: 0 19px }
+}
+
 .notifications_container {
 	margin: inherit; /* Overrides default popover style */
-	top: 10px;
+	top: 30px;
 	left: auto;
 	right: 10px;
 	background-color: transparent;
@@ -33,6 +51,10 @@
 	color: white;
 	padding: 5px;
 	margin: 5px;
+	cursor: pointer;
+}
+
+.notification-fade {
 	animation-name: notification_fade;
 	animation-duration: 5s;
 	animation-fill-mode: forwards;
@@ -56,3 +78,6 @@
 	background-color: dodgerblue;
 }
 
+.notification_sender {
+	font-weight: bold;
+}

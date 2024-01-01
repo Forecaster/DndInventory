@@ -19,14 +19,16 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 	<script src="/libraries_javascript/jquery.min.js"></script>
 	<script src="/libraries_javascript/popper.min.js"></script>
+	<script src="libraries/peerjs.min.js"></script>
 	<link rel="stylesheet" href="styles/main.css" />
 	<link rel="stylesheet" href="styles/inputs.css" />
 	<link rel="stylesheet" href="styles/inventory.css" />
 	<link rel="stylesheet" href="styles/character.css" />
 	<link rel="stylesheet" href="styles/menu.css" />
+	<link rel="stylesheet" href="styles/console.css" />
+	<link rel="stylesheet" href="styles/dice.css" />
 
 	<script src="functions.js"></script>
-	<script src="dialogs_session.js"></script>
 
 	<!-- Enums -->
 	<script src="enums/CharacterSize.js"></script>
@@ -39,6 +41,8 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="classes_structure/Notifications.js"></script>
 	<script src="classes_structure/Tooltip.js"></script>
 	<script src="classes_structure/PopoutElement.js"></script>
+	<script src="classes_structure/ClientConsole.js"></script>
+	<script src="classes_data/PeerJsConnection.js"></script>
 	<script src="classes_data/KeyStore.js"></script>
 	<script src="classes_data/Serializable.js"></script>
 	<script src="classes_data/Character.js"></script>
@@ -53,6 +57,16 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<script src="classes_data/FieldNumber.js"></script>
 	<script src="classes_data/FieldCheckbox.js"></script>
 	<script src="classes_data/FieldGroup.js"></script>
+
+	<!-- Dice classes -->
+	<script src="classes_dice/DiceStringParser.js"></script>
+	<script src="classes_dice/DiceModType.js"></script>
+	<script src="classes_dice/DiceModMode.js"></script>
+	<script src="classes_dice/DiceMod.js"></script>
+	<script src="classes_dice/DiceGroup.js"></script>
+	<script src="classes_dice/DiceResult.js"></script>
+	<script src="classes_dice/DiceResultDecorator.js"></script>
+	<script src="classes_dice/DiceResultCollection.js"></script>
 
 	<!-- Dialog classes -->
 	<script src="dialog_classes/Dialog.js"></script>
@@ -138,6 +152,16 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<div class="b"><label for="session_load_pwd">GM password:</label></div>
 	<div class="sm-text">Enter the password that was set as the GM password when the session was created.</div>
 	<div style="margin-bottom: 8px;"><input type="password" class="form-control" id="session_load_pwd" placeholder="Session password" /></div>
+	<div class="b"><label for="session_load_session_length">Session length:</label></div>
+	<div class="sm-text">Only use long or very long on your own devices!</div>
+	<div style="margin-bottom: 8px;">
+	<select id="session_load_session_length" class="form-control">
+		<option value="short">Short (4 hours)</option>
+		<option value="medium" selected="selected">Medium (1 day)</option>
+		<option value="long">Long (1 month)</option>
+		<option value="very_long">Very long (1 year)</option>
+	</select>
+	</div>
 	<div style="text-align: center;"><button id="session_load_button" class="btn btn-primary">Load</button></div>
 </dialog>
 <dialog id="session_join" class="dialog">
@@ -151,7 +175,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<div style="margin-bottom: 8px;"><input type="text" class="form-control" id="session_join_id" placeholder="Session ID" /></div>
 	<div class="b"><label for="session_join_pwd">Session password:</label></div>
 	<div style="margin-bottom: 8px;"><input type="password" class="form-control" id="session_join_pwd" placeholder="Session password" /></div>
-	<div style="text-align: center;"><button id="join" class="btn btn-primary">Join</button></div>
+	<div style="text-align: center;"><button id="session_join_button_join" class="btn btn-primary save_button">Join</button></div>
 </dialog>
 <!-- </editor-fold> -->
 <!-- <editor-fold desc="Dialogs characters"> -->
@@ -171,6 +195,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<div id="field_container" class="field_container"></div>
 </dialog>
 <!-- </editor-fold> -->
+<div id="console" class="console"></div>
 <div id="menu_top" class="menu_top">
 	<div id="clock_real" class="clock_real"></div>
 </div>
@@ -189,6 +214,8 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 <!--	<div id="equipment_container" style="background-image: url('images/character.png'); width: 408px; height: 503px; position: relative; float: left;"></div>-->
 	<div id="character_container" class="character_container">
 		<div>Either there's nobody here or everyone rolled high stealth...</div>
+	</div>
+	<div id="test">
 	</div>
 </div>
 <div id="shop" style="position: fixed; top: 10px; right: 10px;"></div>
@@ -209,19 +236,66 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	const input_strength = document.querySelector("#input_strength");
 	const shop = document.querySelector("#shop");
 	const equipment_container = document.querySelector("#equipment_container");
+	// </editor-fold>
 
+	PeerJsEvent.DIE_ROLL = new PeerJsEvent("Die roll");
+
+	// <editor-fold desc="System">
 	const notifications = new Notifications("#notification_container");
 
-	const dialog_session_create_join = new DialogSessionCreateJoin("#session_create_join");
-	const dialog_session_create = new DialogSessionCreate("#session_create", { external_buttons: { open: [ "#session_create_open" ] } });
-	const dialog_session_load = new DialogSessionLoad("#session_load", { external_buttons: { open: [ "#session_load_open" ] } });
-	const dialog_session_join = new DialogSessionJoin("#session_join", { external_buttons: { open: [ "#session_join_open" ] } });
+	const client_console = new ClientConsole("#console", { message_handler: message => {
+			peer.SendMessage(message, session.GetUserName());
+		}
+	});
+	client_console.AddCommand("roll", {
+		description: "Rolls dice. Ex: 2d20",
+		action: function(args) {
+			const dice_string = args.join(" ");
+			/** @var {DiceStringParser} */
+			const parsed = DiceStringParser.ParseDiceString(dice_string);
 
-	const dialog_create_character = new DialogCreateCharacter("#create_character");
-	const dialog_character_sheet = new DialogCharacterSheet("#character_sheet");
+			parsed.Roll();
+			let str = parsed.GetFormattedString();
+			let result = "";
+			if (is_math_expression(str))
+				result = " => " + parse_math_expression(parse_html_dice_string(str));
+			const display = parsed.GetFormattedString({ simple_html_format: true });
+			console.debug(display);
+			console.debug(str);
+			client_console.AddMessage(display + result);
+			const dice_html = parsed.GetFormattedString({full_html_format: true, append_sum: true});
+			notifications.Dice(dice_html, {duration: 0});
+			peer.SendEvent(PeerJsEvent.DIE_ROLL, dice_html);
+		}
+	});
+	client_console.AddAliasForCommand("roll", "dice");
+
+	const peer = new PeerJsConnection({ message_handler: (message, sender) => {
+			client_console.AddMessage(sender + ": " + message);
+		}, custom_event_handler: event => {
+			if (event === PeerJsEvent.DIE_ROLL) {
+				notifications.Dice(event.event_data.content, { duration: 0, sender: event.event_data.sender });
+			}
+		}
+	});
+	// </editor-fold>
+
+	// <editor-fold desc="Dialogs">
+	function shift_notification_container() {
+		notifications.Shift();
+	}
+
+	const dialog_session_create_join = new DialogSessionCreateJoin("#session_create_join", { post_open: shift_notification_container });
+	const dialog_session_create = new DialogSessionCreate("#session_create", { external_buttons: { open: [ "#session_create_open" ] }, post_open: shift_notification_container });
+	const dialog_session_load = new DialogSessionLoad("#session_load", { external_buttons: { open: [ "#session_load_open" ] }, post_open: shift_notification_container });
+	const dialog_session_join = new DialogSessionJoin("#session_join", { external_buttons: { open: [ "#session_join_open" ] }, post_open: shift_notification_container });
+
+	const dialog_create_character = new DialogCreateCharacter("#create_character", { post_open: shift_notification_container });
+	const dialog_character_sheet = new DialogCharacterSheet("#character_sheet", { post_open: shift_notification_container });
 
 	const dialog_confirm = new DialogConfirm("#dialog_confirm");
 	const dialog_action = new DialogAction("#dialog_action");
+	// </editor-fold>
 
 	// <editor-fold desc="Notes popout">
 	const textarea_notes = document.createElement("textarea");
@@ -277,7 +351,6 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	// </editor-fold>
 
 	const clock_real = document.querySelector("#clock_real");
-	// </editor-fold>
 
 	// <editor-fold desc="Clock timer">
 	setInterval(() => {
@@ -345,5 +418,12 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	// console.debug(equipment);
 	// equipment.PopulateContainer(equipment_container);
 	//</editor-fold>
+
+	function test_roll(dice) {
+		const d = DiceStringParser.ParseDiceString(dice)
+		d.Roll()
+		console.debug(d);
+		notifications.Dice(d.GetFormattedString({ html_format: true, append_sum: true }), { duration: 0 })
+	}
 
 </script>

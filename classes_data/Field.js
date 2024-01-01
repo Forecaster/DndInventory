@@ -1,4 +1,5 @@
 class Field extends Serializable {
+	// <editor-fold desc="Properties">
 	/** @var {string} */
 	Label
 	/** @var {string} */
@@ -82,26 +83,31 @@ class Field extends Serializable {
 			KeyStore.AddKeyUser(key, this);
 		})
 	}
-	/** @var {string[]} */
-	FormulaKeys
+	/** @var {string} */
+	DiceFormula
+	/** @var {string} */
+	UserDiceFormula
 	/** @var {FieldGroup[]} */
 	ParentObjects = [];
+	// </editor-fold>
 
 	/**
 	 * @param {string} label
-	 * @param {{ [label_short]:string, [key]:string, [value]:any, [rollable]:string, [size]:int, [sub_fields]:Field[], [sub_field_divider]:string, [formula]:string }} [options]
+	 * @param {{ [label_short]:string, [key]:string, [value]:any, [size]:int, [sub_fields]:Field[], [sub_field_divider]:string, [formula]:string, [user_formula]:string, [dice_formula]:string, [user_dice_formula]:string }} [options]
 	 */
 	constructor(label, options = {}) {
 		super();
 		this.Label = label;
 		this.LabelShort = options.label_short ?? null;
 		this.Key = options.key ?? null;
-		this.Rollable = options.rollable ?? null;
 		this.Size = options.size ?? null;
 		this.SubFields = options.sub_fields ?? [];
 		this.SubFieldDivider = options.sub_field_divider ?? "";
 		this.Value = options.value ?? null;
 		this.Formula = options.formula ?? null;
+		this.UserFormula = options.user_formula ?? null;
+		this.DiceFormula = options.dice_formula ?? null;
+		this.UserDiceFormula = options.user_dice_formula ?? null;
 
 		KeyStore.AddField(this);
 	}
@@ -159,7 +165,11 @@ class Field extends Serializable {
 	 */
 	GetInput(options = {}) {
 		let inputs = [];
+		let container = document.createElement("span");
+		container.style.position = "relative";
+
 		let input = document.createElement("input");
+		container.appendChild(input);
 		input.id = "field_" + this.InstanceID;
 		input.setAttribute("field-type", this.constructor.name);
 		input.setAttribute("field-label", this.Label);
@@ -193,7 +203,26 @@ class Field extends Serializable {
 			input.setAttribute("readonly", "true");
 			this.ParseFormula();
 		}
-		inputs.push(input);
+		inputs.push(container);
+
+		// Generate roll button
+		if (this.DiceFormula !== null || this.UserDiceFormula !== null) {
+			const btn = document.createElement("div");
+			btn.className = "d20-button";
+			btn.title = "Roll '" + (this.UserDiceFormula !== null ? this.UserDiceFormula : this.DiceFormula) + "'";
+			btn.addEventListener("click", () => {
+				const character = this.GetParentCharacter().Name;
+				const dice_formula = this.UserDiceFormula !== null ? this.UserDiceFormula : this.DiceFormula;
+				const dice = DiceStringParser.ParseDiceString(dice_formula.replace("{val}", this.Value.toString()));
+				dice.Roll();
+				let html = "<div style='font-weight: bold;'>" + character + " rolled for " + this.Label + ":</div>"
+				html += dice.GetFormattedString({ html_format: true, append_sum: true });
+				notifications.Dice(html, { duration: 0 });
+			})
+			container.appendChild(btn);
+		}
+
+		// Get sub-fields
 		if (Array.isArray(this.SubFields) && !options.ignore_sub_field) {
 			this.SubFields.forEach((sub_field) => {
 				inputs = inputs.concat(sub_field.GetField(options));
@@ -238,12 +267,14 @@ class Field extends Serializable {
 		}
 		return new constructor(this.Label, {
 			key: this.Key,
-			rollable: this.Rollable,
 			sub_fields: sub,
 			sub_field_divider: this.SubFieldDivider,
 			value: this.Value,
 			size: this.Size,
 			formula: this.Formula,
+			user_formula: this.UserFormula,
+			dice_formula: this.DiceFormula,
+			user_dice_formula: this.UserDiceFormula,
 			label_short: this.LabelShort,
 		});
 	}

@@ -80,7 +80,7 @@ input.failed {
 	overflow: visible;
 	outline: none;
 	border: none;
-	box-shadow: 6px 6px rgba(255,255,255,0.03);
+	box-shadow: 6px 6px rgba(255, 255, 255, 0.03);
 }
 
 .dialog::backdrop {
@@ -115,7 +115,7 @@ input.failed {
 }
 
 .stripes .row:nth-child(2n+1) {
-	background-color: rgba(0,0,0,.1);
+	background-color: rgba(0, 0, 0, .1);
 }
 
 .main_container {
@@ -143,4 +143,18 @@ input.failed {
 	font-size: 12pt;
 	font-weight: bold;
 	margin-top: 8px;
+}
+
+.d20-button {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	background-color: red;
+	clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 95%, 5% 75%, 5% 25%);
+	opacity: 0.2;
+	cursor: pointer;
+}
+
+.d20-button:hover {
+	opacity: 1;
 }
