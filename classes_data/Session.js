@@ -8,8 +8,9 @@ class Session {
 	Ruleset
 	/** @var {int} */
 	EncumbranceOption
-	/** @var {string[]} */
-	Players
+
+	/** @var {function|null} */
+	OnSessionStart
 
 	CurrentUsername = null;
 	/** @var {string|null} */
@@ -34,16 +35,16 @@ class Session {
 	}
 
 	/**
-	 * @param {string} id
-	 * @param {{ [name]: string, [ruleset]:string, [encumbrance_option]:int }} [options]
+	 * @param {{ [id]:string, [name]: string, [ruleset]:string, [encumbrance_option]:int, [username]:string, [on_session_start]:function }} [options]
 	 */
-	constructor(id, options = {}) {
-		this.ID = id;
-		this.Name = options.name || null;
-		this.Ruleset = Ruleset[options.ruleset] || null;
-		this.EncumbranceOption = options.encumbrance_option || 0;
+	constructor(options = {}) {
+		this.ID = options.id ?? null;
+		this.Name = options.name ?? null;
+		this.Ruleset = Ruleset[options.ruleset] ?? null;
+		this.EncumbranceOption = options.encumbrance_option ?? 0;
+		this.CurrentUsername = options.username ?? null;
 
-		this.Players = [];
+		this.OnSessionStart = options.on_session_start ?? null;
 	}
 
 	toString() {
@@ -89,7 +90,6 @@ class Session {
 	}
 
 	static RetrievePreviousSession() {
-		const session = new Session("");
 		session.Token = localStorage.getItem(Session.#StorageKeyToken);
 		session.ID = localStorage.getItem(Session.#StorageKeyID);
 		session.CurrentUsername = localStorage.getItem(Session.#StorageKeyPlayer);
@@ -179,7 +179,7 @@ class Session {
 		if (typeof options.fail_callback !== "function")
 			options.fail_callback = (result, msg) => { console.error(result, msg) };
 		console.debug("JoinSession", options);
-		const data = { session_id: this.ID, username: this.CurrentUsername, pwd: options.pwd || null };
+		const data = { session_id: this.ID, player: this.CurrentUsername, pwd: options.pwd || null };
 		API.Call("session_join", {
 			data: data,
 			success: (payload) => {
@@ -213,6 +213,7 @@ class Session {
 			return;
 		}
 		const data = { session_id: this.ID, token: this.Token, player: this.CurrentUsername };
+		console.debug("resume", data);
 		API.Call("session_resume", {
 			data: data,
 			success: (payload) => {
@@ -231,7 +232,8 @@ class Session {
 	}
 
 	SyncCharacters() {
-		const data = { session_id: this.ID, username: this.CurrentUsername, token: this.Token, last_sync: this.#LastSync };
+		const data = { session_id: this.ID, player: this.CurrentUsername, token: this.Token, last_sync: this.#LastSync };
+		console.debug(data);
 		/** @var {{ result:number, msg:string, data:{ characters:object } }} payload */
 		API.Call("character_sync", {
 			data: data,
@@ -247,6 +249,11 @@ class Session {
 				}
 				refresh_characters();
 				notifications.Success(`${characters.length} character${characters.length===1?"":"s"} loaded from server!`);
+			},
+			fail: (result, options) => {
+				notifications.Error("Character sync failed! " + options.msg);
+				console.error("Character sync failed!");
+				console.error(options);
 			}
 		});
 	}
@@ -264,9 +271,16 @@ class Session {
 			});
 			container.appendChild(btn);
 		})
+
+		if (typeof this.OnSessionStart === "function")
+			this.OnSessionStart();
 	}
 
 	Leave() {
+		this.ID = null;
+		this.CurrentUsername = null;
+		this.Ruleset = null;
+		this.Name = null;
 		localStorage.removeItem(Session.#StorageKeyToken);
 		localStorage.removeItem(Session.#StorageKeyID);
 		localStorage.removeItem(Session.#StorageKeyPlayer);

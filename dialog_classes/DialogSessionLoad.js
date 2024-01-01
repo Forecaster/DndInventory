@@ -73,7 +73,7 @@ class DialogSessionLoad extends Dialog {
 			session_length = { months: 1 };
 		else if (this.ElementSessionLength.value === "very_long")
 			session_length = { years: 1 };
-		session = new Session(this.ElementSessionID.value);
+		session.ID = this.ElementSessionID.value;
 		session.LoadSession({ length: session_length, gm_pwd: this.ElementGMPassword.value, success_callback: (() => {
 				let history = localStorage.getItem("history_session_id");
 				if (history !== null) {

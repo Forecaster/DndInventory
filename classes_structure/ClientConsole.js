@@ -143,7 +143,10 @@ class ClientConsole {
 				this.AddMessage("Unknown command. Type /help or /? for help. Type /commands for a list of commands.");
 			}
 		} else {
-			this.AddMessage(session.GetUserName() + ": " + console_input);
+			if (typeof this.MessageHandler === "function")
+				this.MessageHandler(console_input);
+			else
+				this.AddMessage(console_input);
 		}
 		console.debug(console_input);
 	}

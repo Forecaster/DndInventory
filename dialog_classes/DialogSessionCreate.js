@@ -49,10 +49,9 @@ class DialogSessionCreate extends Dialog {
 	}
 
 	Save() {
-		session = new Session(this.ElementSessionID.value, {
-			name: this.ElementSessionName.value,
-			ruleset: this.ElementRuleset.value
-		});
+		session.ID = this.ElementSessionID.value;
+		session.Name = this.ElementSessionName.value;
+		session.Ruleset = this.ElementRuleset.value;
 		session.RegisterSession({
 			gm_pwd: this.ElementGMPassword.value,
 			session_pwd: this.ElementSessionPassword.value,

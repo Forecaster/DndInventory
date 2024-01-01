@@ -102,6 +102,8 @@ class Notifications {
 	 */
 	Error(msg, options = {}) {
 		options.type = "error";
+		if (!options.hasOwnProperty("duration"))
+			options.duration = 0;
 		this.Send(msg, options);
 	}
 

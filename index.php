@@ -151,7 +151,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<div style="margin-bottom: 8px;"><input type="text" class="form-control" id="session_load_id" placeholder="Session ID" /></div>
 	<div class="b"><label for="session_load_pwd">GM password:</label></div>
 	<div class="sm-text">Enter the password that was set as the GM password when the session was created.</div>
-	<div style="margin-bottom: 8px;"><input type="password" class="form-control" id="session_load_pwd" placeholder="Session password" /></div>
+	<div style="margin-bottom: 8px;"><form><input type="password" class="form-control" id="session_load_pwd" placeholder="Session password" autocomplete="off" /></form></div>
 	<div class="b"><label for="session_load_session_length">Session length:</label></div>
 	<div class="sm-text">Only use long or very long on your own devices!</div>
 	<div style="margin-bottom: 8px;">
@@ -174,7 +174,7 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	<div class="sm-text">Enter the ID of the session you wish to join given to you by your GM.</div>
 	<div style="margin-bottom: 8px;"><input type="text" class="form-control" id="session_join_id" placeholder="Session ID" /></div>
 	<div class="b"><label for="session_join_pwd">Session password:</label></div>
-	<div style="margin-bottom: 8px;"><input type="password" class="form-control" id="session_join_pwd" placeholder="Session password" /></div>
+	<div style="margin-bottom: 8px;"><form><input type="password" class="form-control" id="session_join_pwd" placeholder="Session password" autocomplete="off" /></form></div>
 	<div style="text-align: center;"><button id="session_join_button_join" class="btn btn-primary save_button">Join</button></div>
 </dialog>
 <!-- </editor-fold> -->
@@ -238,12 +238,14 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	const equipment_container = document.querySelector("#equipment_container");
 	// </editor-fold>
 
-	PeerJsEvent.DIE_ROLL = new PeerJsEvent("Die roll");
-
-	// <editor-fold desc="System">
+	// <editor-fold desc="Notifications">
 	const notifications = new Notifications("#notification_container");
+	// </editor-fold>
 
-	const client_console = new ClientConsole("#console", { message_handler: message => {
+	// <editor-fold desc="Client console">
+	const client_console = new ClientConsole("#console", {
+		message_handler: message => {
+			client_console.AddMessage(session.GetUserName() + ": " + message);
 			peer.SendMessage(message, session.GetUserName());
 		}
 	});
@@ -265,17 +267,34 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 			client_console.AddMessage(display + result);
 			const dice_html = parsed.GetFormattedString({full_html_format: true, append_sum: true});
 			notifications.Dice(dice_html, {duration: 0});
-			peer.SendEvent(PeerJsEvent.DIE_ROLL, dice_html);
+			peer.SendEvent(PeerJsEvent.DIE_ROLL, { dice_fancy: dice_html, dice_plain: display, sender: session.GetUserName() });
 		}
 	});
 	client_console.AddAliasForCommand("roll", "dice");
+	// </editor-fold>
 
-	const peer = new PeerJsConnection({ message_handler: (message, sender) => {
+	// <editor-fold desc="PeerJsConnection">
+	PeerJsEvent.DIE_ROLL = new PeerJsEvent("Die roll");
+	PeerJsEvent.CHARACTER_UPDATE = new PeerJsEvent("Character update");
+
+	const peer = new PeerJsConnection({
+		message_handler: (message, sender) => {
 			client_console.AddMessage(sender + ": " + message);
-		}, custom_event_handler: event => {
+		},
+		custom_event_handler: event => {
 			if (event === PeerJsEvent.DIE_ROLL) {
-				notifications.Dice(event.event_data.content, { duration: 0, sender: event.event_data.sender });
+				notifications.Dice(event.event_data.dice_fancy, { duration: 0, sender: event.event_data.sender });
+				client_console.AddMessage(event.event_data.sender + " rolled " + event.event_data.dice_plain);
+			} else if (event === PeerJsEvent.CHARACTER_UPDATE) {
+				session.SyncCharacters();
+			} else if (event === PeerJsEvent.CONFIRM_CONNECT) {
+				notifications.Success(event.event_data + " connected!");
+			} else if (event === PeerJsEvent.HOST_CONNECT) {
+				notifications.Success("Connected to GM!");
 			}
+		},
+		confirm_connect_data: () => {
+			return session.CurrentUsername;
 		}
 	});
 	// </editor-fold>
@@ -370,7 +389,13 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 
 	// <editor-fold desc="Setup variables">
 	/** @var {Session} */
-	let session = null;
+	let session = new Session({ on_session_start: () => {
+		if (session.CurrentUsername === null) {
+			peer.RegisterHost(session.ID);
+		} else {
+			peer.ConnectToHost(session.ID);
+		}
+	}})
 	/** @var {Character[]} */
 	let characters = [];
 	let fields = [];
@@ -418,12 +443,5 @@ foreach (glob("images/game-icons/*/*.png") as $f) {
 	// console.debug(equipment);
 	// equipment.PopulateContainer(equipment_container);
 	//</editor-fold>
-
-	function test_roll(dice) {
-		const d = DiceStringParser.ParseDiceString(dice)
-		d.Roll()
-		console.debug(d);
-		notifications.Dice(d.GetFormattedString({ html_format: true, append_sum: true }), { duration: 0 })
-	}
 
 </script>

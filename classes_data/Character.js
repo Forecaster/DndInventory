@@ -374,6 +374,11 @@ class Character extends Serializable {
 				if (this.ID === null || this.ID === "")
 					this.ID = payload.data.id;
 				notifications.Success(`Character '${this.Name}' saved!`);
+			},
+			fail: payload => {
+				const msg = `Character upload failed for ${this.Name}!`;
+				console.error(msg, payload);
+				notifications.Error(msg, { duration: 0 });
 			}
 		})
 	}
